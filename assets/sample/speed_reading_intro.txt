@@ -1,0 +1,11 @@
+Welcome to Speed Reading
+
+Speed reading is a collection of techniques used to read faster without a large loss of comprehension. Most people read at a rate of about two hundred to three hundred words per minute. With practice, many readers can comfortably push well beyond that.
+
+One common idea behind rapid reading is to reduce subvocalization. Subvocalization is the silent inner voice that pronounces each word as you read. While it helps comprehension, it also limits speed to roughly the pace of speech. By training your eyes to recognize whole words and short groups of words at a glance, you can begin to move past that limit.
+
+This application shows words one small group at a time in a fixed location on the screen. Because your eyes do not have to move across long lines of text, you waste less time and energy. A single highlighted letter marks the optimal recognition point of each word, giving your eyes a stable anchor to focus on.
+
+The bottom section keeps the full original text visible. As the focus reader advances, the matching word is highlighted so you never lose your place. You can tap any word to jump there instantly, or use the controls to move by sentence.
+
+Start slowly. Pick a speed that feels just a little uncomfortable, and let your comprehension catch up over several sessions. With steady practice, reading faster becomes a natural habit.
