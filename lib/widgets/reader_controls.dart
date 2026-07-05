@@ -38,7 +38,7 @@ class ReaderControls extends StatelessWidget {
               IconButton(
                 tooltip: 'Back 5 seconds',
                 icon: Icon(
-                  Icons.replay_5_rounded,
+                  Icons.fast_rewind_rounded,
                   size: 26,
                   color: scheme.onSurfaceVariant,
                 ),
@@ -78,7 +78,7 @@ class ReaderControls extends StatelessWidget {
               IconButton(
                 tooltip: 'Forward 5 seconds',
                 icon: Icon(
-                  Icons.forward_5_rounded,
+                  Icons.fast_forward_rounded,
                   size: 26,
                   color: scheme.onSurfaceVariant,
                 ),
