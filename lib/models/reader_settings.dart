@@ -30,20 +30,23 @@ class ReaderSettings {
   final bool showHelperText;
   final ThemeMode themeMode;
 
-  /// null → theme `onSurface`.
-  final Color? currentWordColor;
-  final Color centralLetterColor;
-  final Color guideLineColor;
-  final Color helperHighlightColor;
+  // --- Light Theme Colors ---
+  final Color? currentWordColorLight;
+  final Color centralLetterColorLight;
+  final Color guideLineColorLight;
+  final Color helperHighlightColorLight;
+  final Color? backgroundColorLight;
+  final Color? focusBackgroundColorLight;
+  final Color? progressBarColorLight;
 
-  /// null → theme `surface`.
-  final Color? backgroundColor;
-
-  /// null → a neutral derived from theme.
-  final Color? focusBackgroundColor;
-
-  /// null → theme `primary` (accent).
-  final Color? progressBarColor;
+  // --- Dark Theme Colors ---
+  final Color? currentWordColorDark;
+  final Color centralLetterColorDark;
+  final Color guideLineColorDark;
+  final Color helperHighlightColorDark;
+  final Color? backgroundColorDark;
+  final Color? focusBackgroundColorDark;
+  final Color? progressBarColorDark;
 
   const ReaderSettings({
     this.wordsPerMinute = 300,
@@ -52,14 +55,26 @@ class ReaderSettings {
     this.wordsPerEntry = 1,
     this.showHelperText = true,
     this.themeMode = ThemeMode.system,
-    this.currentWordColor,
-    this.centralLetterColor = const Color(0xFFE8590C), // red-orange
-    this.guideLineColor = const Color(0xFF9E9E9E), // grey
-    this.helperHighlightColor = const Color(0xFFFFEB3B), // yellow
-    this.backgroundColor,
-    this.focusBackgroundColor,
-    this.progressBarColor,
+    
+    // Light Defaults
+    this.currentWordColorLight,
+    this.backgroundColorLight,
+    this.focusBackgroundColorLight,
+    this.progressBarColorLight,
+    this.centralLetterColorLight = const Color(0xFFE8590C), // orange
+    this.guideLineColorLight = const Color(0xFF9E9E9E), // grey
+    this.helperHighlightColorLight = const Color(0xFFFFEB3B), // yellow
+    
+    // Dark Defaults
+    this.currentWordColorDark,
+    this.backgroundColorDark,
+    this.focusBackgroundColorDark,
+    this.progressBarColorDark,
+    this.centralLetterColorDark = const Color(0xFFE8590C), // orange
+    this.guideLineColorDark = const Color(0xFF757575), // darker grey
+    this.helperHighlightColorDark = const Color(0xFFF1C40F), // yellow
   });
+
 
   /// Spec bounds (§5A, §5C, §5D).
   static const int minWpm = 100;
@@ -76,13 +91,24 @@ class ReaderSettings {
     int? wordsPerEntry,
     bool? showHelperText,
     ThemeMode? themeMode,
-    Color? currentWordColor,
-    Color? centralLetterColor,
-    Color? guideLineColor,
-    Color? helperHighlightColor,
-    Color? backgroundColor,
-    Color? focusBackgroundColor,
-    Color? progressBarColor,
+    
+    // Light
+    Color? currentWordColorLight,
+    Color? backgroundColorLight,
+    Color? focusBackgroundColorLight,
+    Color? progressBarColorLight,
+    Color? centralLetterColorLight,
+    Color? guideLineColorLight,
+    Color? helperHighlightColorLight,
+
+    // Dark
+    Color? currentWordColorDark,
+    Color? backgroundColorDark,
+    Color? focusBackgroundColorDark,
+    Color? progressBarColorDark,
+    Color? centralLetterColorDark,
+    Color? guideLineColorDark,
+    Color? helperHighlightColorDark,
   }) {
     return ReaderSettings(
       wordsPerMinute: wordsPerMinute ?? this.wordsPerMinute,
@@ -91,13 +117,24 @@ class ReaderSettings {
       wordsPerEntry: wordsPerEntry ?? this.wordsPerEntry,
       showHelperText: showHelperText ?? this.showHelperText,
       themeMode: themeMode ?? this.themeMode,
-      currentWordColor: currentWordColor ?? this.currentWordColor,
-      centralLetterColor: centralLetterColor ?? this.centralLetterColor,
-      guideLineColor: guideLineColor ?? this.guideLineColor,
-      helperHighlightColor: helperHighlightColor ?? this.helperHighlightColor,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      focusBackgroundColor: focusBackgroundColor ?? this.focusBackgroundColor,
-      progressBarColor: progressBarColor ?? this.progressBarColor,
+      
+      // Light
+      currentWordColorLight: currentWordColorLight ?? this.currentWordColorLight,
+      backgroundColorLight: backgroundColorLight ?? this.backgroundColorLight,
+      focusBackgroundColorLight: focusBackgroundColorLight ?? this.focusBackgroundColorLight,
+      progressBarColorLight: progressBarColorLight ?? this.progressBarColorLight,
+      centralLetterColorLight: centralLetterColorLight ?? this.centralLetterColorLight,
+      guideLineColorLight: guideLineColorLight ?? this.guideLineColorLight,
+      helperHighlightColorLight: helperHighlightColorLight ?? this.helperHighlightColorLight,
+
+      // Dark
+      currentWordColorDark: currentWordColorDark ?? this.currentWordColorDark,
+      backgroundColorDark: backgroundColorDark ?? this.backgroundColorDark,
+      focusBackgroundColorDark: focusBackgroundColorDark ?? this.focusBackgroundColorDark,
+      progressBarColorDark: progressBarColorDark ?? this.progressBarColorDark,
+      centralLetterColorDark: centralLetterColorDark ?? this.centralLetterColorDark,
+      guideLineColorDark: guideLineColorDark ?? this.guideLineColorDark,
+      helperHighlightColorDark: helperHighlightColorDark ?? this.helperHighlightColorDark,
     );
   }
 
@@ -108,13 +145,24 @@ class ReaderSettings {
         'wordsPerEntry': wordsPerEntry,
         'showHelperText': showHelperText,
         'themeMode': themeMode.name,
-        'currentWordColor': currentWordColor?.toARGB32(),
-        'centralLetterColor': centralLetterColor.toARGB32(),
-        'guideLineColor': guideLineColor.toARGB32(),
-        'helperHighlightColor': helperHighlightColor.toARGB32(),
-        'backgroundColor': backgroundColor?.toARGB32(),
-        'focusBackgroundColor': focusBackgroundColor?.toARGB32(),
-        'progressBarColor': progressBarColor?.toARGB32(),
+        
+        // Light
+        'currentWordColorLight': currentWordColorLight?.toARGB32(),
+        'backgroundColorLight': backgroundColorLight?.toARGB32(),
+        'focusBackgroundColorLight': focusBackgroundColorLight?.toARGB32(),
+        'progressBarColorLight': progressBarColorLight?.toARGB32(),
+        'centralLetterColorLight': centralLetterColorLight.toARGB32(),
+        'guideLineColorLight': guideLineColorLight.toARGB32(),
+        'helperHighlightColorLight': helperHighlightColorLight.toARGB32(),
+
+        // Dark
+        'currentWordColorDark': currentWordColorDark?.toARGB32(),
+        'backgroundColorDark': backgroundColorDark?.toARGB32(),
+        'focusBackgroundColorDark': focusBackgroundColorDark?.toARGB32(),
+        'progressBarColorDark': progressBarColorDark?.toARGB32(),
+        'centralLetterColorDark': centralLetterColorDark.toARGB32(),
+        'guideLineColorDark': guideLineColorDark.toARGB32(),
+        'helperHighlightColorDark': helperHighlightColorDark.toARGB32(),
       };
 
   factory ReaderSettings.fromJson(Map<String, dynamic> json) {
@@ -122,6 +170,15 @@ class ReaderSettings {
     Color? colorOrNull(Object? v) => v == null ? null : Color(v as int);
     Color colorOr(Object? v, Color fallback) =>
         v == null ? fallback : Color(v as int);
+
+    final legacyCurrentWord = json['currentWordColor'];
+    final legacyBackground = json['backgroundColor'];
+    final legacyFocusBackground = json['focusBackgroundColor'];
+    final legacyProgressBar = json['progressBarColor'];
+    final legacyCentralLetter = json['centralLetterColor'];
+    final legacyGuideLine = json['guideLineColor'];
+    final legacyHelperHighlight = json['helperHighlightColor'];
+
     return ReaderSettings(
       wordsPerMinute: json['wordsPerMinute'] as int? ?? defaults.wordsPerMinute,
       fontType: ReaderFontType.values.byName(
@@ -131,15 +188,30 @@ class ReaderSettings {
       showHelperText: json['showHelperText'] as bool? ?? defaults.showHelperText,
       themeMode: ThemeMode.values
           .byName(json['themeMode'] as String? ?? defaults.themeMode.name),
-      currentWordColor: colorOrNull(json['currentWordColor']),
-      centralLetterColor:
-          colorOr(json['centralLetterColor'], defaults.centralLetterColor),
-      guideLineColor: colorOr(json['guideLineColor'], defaults.guideLineColor),
-      helperHighlightColor:
-          colorOr(json['helperHighlightColor'], defaults.helperHighlightColor),
-      backgroundColor: colorOrNull(json['backgroundColor']),
-      focusBackgroundColor: colorOrNull(json['focusBackgroundColor']),
-      progressBarColor: colorOrNull(json['progressBarColor']),
+      
+      // Light
+      currentWordColorLight: colorOrNull(json['currentWordColorLight'] ?? legacyCurrentWord),
+      backgroundColorLight: colorOrNull(json['backgroundColorLight'] ?? legacyBackground),
+      focusBackgroundColorLight: colorOrNull(json['focusBackgroundColorLight'] ?? legacyFocusBackground),
+      progressBarColorLight: colorOrNull(json['progressBarColorLight'] ?? legacyProgressBar),
+      centralLetterColorLight: colorOr(
+          json['centralLetterColorLight'] ?? legacyCentralLetter, defaults.centralLetterColorLight),
+      guideLineColorLight: colorOr(
+          json['guideLineColorLight'] ?? legacyGuideLine, defaults.guideLineColorLight),
+      helperHighlightColorLight: colorOr(
+          json['helperHighlightColorLight'] ?? legacyHelperHighlight, defaults.helperHighlightColorLight),
+
+      // Dark
+      currentWordColorDark: colorOrNull(json['currentWordColorDark'] ?? legacyCurrentWord),
+      backgroundColorDark: colorOrNull(json['backgroundColorDark'] ?? legacyBackground),
+      focusBackgroundColorDark: colorOrNull(json['focusBackgroundColorDark'] ?? legacyFocusBackground),
+      progressBarColorDark: colorOrNull(json['progressBarColorDark'] ?? legacyProgressBar),
+      centralLetterColorDark: colorOr(
+          json['centralLetterColorDark'] ?? legacyCentralLetter, defaults.centralLetterColorDark),
+      guideLineColorDark: colorOr(
+          json['guideLineColorDark'] ?? legacyGuideLine, defaults.guideLineColorDark),
+      helperHighlightColorDark: colorOr(
+          json['helperHighlightColorDark'] ?? legacyHelperHighlight, defaults.helperHighlightColorDark),
     );
   }
 
@@ -152,13 +224,24 @@ class ReaderSettings {
       other.wordsPerEntry == wordsPerEntry &&
       other.showHelperText == showHelperText &&
       other.themeMode == themeMode &&
-      other.currentWordColor == currentWordColor &&
-      other.centralLetterColor == centralLetterColor &&
-      other.guideLineColor == guideLineColor &&
-      other.helperHighlightColor == helperHighlightColor &&
-      other.backgroundColor == backgroundColor &&
-      other.focusBackgroundColor == focusBackgroundColor &&
-      other.progressBarColor == progressBarColor;
+      
+      // Light
+      other.currentWordColorLight == currentWordColorLight &&
+      other.backgroundColorLight == backgroundColorLight &&
+      other.focusBackgroundColorLight == focusBackgroundColorLight &&
+      other.progressBarColorLight == progressBarColorLight &&
+      other.centralLetterColorLight == centralLetterColorLight &&
+      other.guideLineColorLight == guideLineColorLight &&
+      other.helperHighlightColorLight == helperHighlightColorLight &&
+
+      // Dark
+      other.currentWordColorDark == currentWordColorDark &&
+      other.backgroundColorDark == backgroundColorDark &&
+      other.focusBackgroundColorDark == focusBackgroundColorDark &&
+      other.progressBarColorDark == progressBarColorDark &&
+      other.centralLetterColorDark == centralLetterColorDark &&
+      other.guideLineColorDark == guideLineColorDark &&
+      other.helperHighlightColorDark == helperHighlightColorDark;
 
   @override
   int get hashCode => Object.hash(
@@ -168,12 +251,19 @@ class ReaderSettings {
         wordsPerEntry,
         showHelperText,
         themeMode,
-        currentWordColor,
-        centralLetterColor,
-        guideLineColor,
-        helperHighlightColor,
-        backgroundColor,
-        focusBackgroundColor,
-        progressBarColor,
+        currentWordColorLight,
+        backgroundColorLight,
+        focusBackgroundColorLight,
+        progressBarColorLight,
+        centralLetterColorLight,
+        guideLineColorLight,
+        helperHighlightColorLight,
+        currentWordColorDark,
+        backgroundColorDark,
+        focusBackgroundColorDark,
+        progressBarColorDark,
+        centralLetterColorDark,
+        guideLineColorDark,
+        helperHighlightColorDark,
       );
 }

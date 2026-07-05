@@ -24,15 +24,28 @@ class ReaderColors {
   });
 
   factory ReaderColors.resolve(ReaderSettings s, ColorScheme scheme) {
-    return ReaderColors(
-      currentWord: s.currentWordColor ?? scheme.onSurface,
-      centralLetter: s.centralLetterColor,
-      guideLine: s.guideLineColor,
-      helperHighlight: s.helperHighlightColor,
-      background: s.backgroundColor ?? scheme.surface,
-      focusBackground: s.focusBackgroundColor ?? scheme.surfaceContainerHighest,
-      progressBar: s.progressBarColor ?? scheme.primary,
-    );
+    final isDark = scheme.brightness == Brightness.dark;
+    if (isDark) {
+      return ReaderColors(
+        currentWord: s.currentWordColorDark ?? scheme.onSurface,
+        centralLetter: s.centralLetterColorDark,
+        guideLine: s.guideLineColorDark,
+        helperHighlight: s.helperHighlightColorDark,
+        background: s.backgroundColorDark ?? scheme.surface,
+        focusBackground: s.focusBackgroundColorDark ?? scheme.surfaceContainerHighest,
+        progressBar: s.progressBarColorDark ?? scheme.primary,
+      );
+    } else {
+      return ReaderColors(
+        currentWord: s.currentWordColorLight ?? scheme.onSurface,
+        centralLetter: s.centralLetterColorLight,
+        guideLine: s.guideLineColorLight,
+        helperHighlight: s.helperHighlightColorLight,
+        background: s.backgroundColorLight ?? scheme.surface,
+        focusBackground: s.focusBackgroundColorLight ?? scheme.surfaceContainerHighest,
+        progressBar: s.progressBarColorLight ?? scheme.primary,
+      );
+    }
   }
 }
 

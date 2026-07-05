@@ -31,12 +31,12 @@ void main() {
     final n = c.read(settingsProvider.notifier);
 
     n.setWordsPerMinute(700);
-    n.setColor(ReaderColorSlot.currentWord, const Color(0xFF112233));
-    expect(c.read(settingsProvider).currentWordColor, const Color(0xFF112233));
+    n.setColor(ReaderColorSlot.currentWord, const Color(0xFF112233), isDark: false);
+    expect(c.read(settingsProvider).currentWordColorLight, const Color(0xFF112233));
 
     n.resetColors();
     final s = c.read(settingsProvider);
-    expect(s.currentWordColor, isNull); // back to theme-dependent default
+    expect(s.currentWordColorLight, isNull); // back to theme-dependent default
     expect(s.wordsPerMinute, 700); // other settings preserved
   });
 
