@@ -12,34 +12,115 @@ class ReaderControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    Widget buildControlItem({
+      required IconData icon,
+      required String label,
+      required String tooltip,
+      required VoidCallback onPressed,
+    }) {
+      return Tooltip(
+        message: tooltip,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 22, color: scheme.onSurfaceVariant),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
-            tooltip: 'Restart',
-            icon: Icon(Icons.replay_rounded, color: scheme.onSurfaceVariant),
-            onPressed: engine.restart,
+          // Restart button with confirmation dialog
+          buildControlItem(
+            icon: Icons.replay_rounded,
+            label: 'Restart',
+            tooltip: 'Restart book',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: isDark ? const Color(0xFF0F0F0F) : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: isDark ? const Color(0xFF2C2C2C) : scheme.outlineVariant.withValues(alpha: 0.5),
+                      width: 0.8,
+                    ),
+                  ),
+                  title: Text(
+                    'Restart Book',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  content: const Text(
+                    'Are you sure you want to return to the very beginning of the book? Your current progress will be reset.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: scheme.primary),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text(
+                        'Restart',
+                        style: TextStyle(color: Colors.redAccent),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                engine.restart();
+              }
+            },
           ),
-          IconButton(
+          buildControlItem(
+            icon: Icons.skip_previous_rounded,
+            label: 'Prev Sent',
             tooltip: 'Previous sentence',
-            icon: Icon(Icons.skip_previous_rounded, color: scheme.onSurfaceVariant),
             onPressed: engine.prevSentence,
           ),
-          IconButton(
-            tooltip: 'Back 5s',
-            icon: Icon(Icons.replay_5_rounded, color: scheme.onSurfaceVariant),
+          buildControlItem(
+            icon: Icons.replay_5_rounded,
+            label: '-5s',
+            tooltip: 'Back 5 seconds',
             onPressed: engine.back5s,
           ),
+          // Large play/pause outline circle button
           ValueListenableBuilder(
             valueListenable: engine.state,
             builder: (context, state, _) {
-              final isDark = theme.brightness == Brightness.dark;
               return Container(
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isDark
@@ -51,7 +132,7 @@ class ReaderControls extends StatelessWidget {
                   ),
                 ),
                 child: IconButton(
-                  iconSize: 26,
+                  iconSize: 24,
                   tooltip: state.isPlaying ? 'Pause' : 'Play',
                   icon: Icon(
                     state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
@@ -62,14 +143,16 @@ class ReaderControls extends StatelessWidget {
               );
             },
           ),
-          IconButton(
-            tooltip: 'Forward 5s',
-            icon: Icon(Icons.forward_5_rounded, color: scheme.onSurfaceVariant),
+          buildControlItem(
+            icon: Icons.forward_5_rounded,
+            label: '+5s',
+            tooltip: 'Forward 5 seconds',
             onPressed: engine.forward5s,
           ),
-          IconButton(
+          buildControlItem(
+            icon: Icons.skip_next_rounded,
+            label: 'Next Sent',
             tooltip: 'Next sentence',
-            icon: Icon(Icons.skip_next_rounded, color: scheme.onSurfaceVariant),
             onPressed: engine.nextSentence,
           ),
         ],

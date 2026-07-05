@@ -88,11 +88,14 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
   bool _toolbarsVisible = true;
   Timer? _idleTimer;
 
+  bool _wasPlaying = false;
+
   @override
   void initState() {
     super.initState();
     // Save position (and stop playback) when the app is backgrounded
     _lifecycle = AppLifecycleListener(onPause: _saveOnBackground);
+    _wasPlaying = widget.session.engine.isPlaying;
     widget.session.engine.state.addListener(_onReaderStateChanged);
     _resetIdleTimer();
   }
@@ -121,12 +124,16 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
   }
 
   void _onReaderStateChanged() {
-    _resetIdleTimer();
-    if (!widget.session.engine.isPlaying) {
-      if (!_toolbarsVisible) {
-        setState(() {
-          _toolbarsVisible = true;
-        });
+    final isPlaying = widget.session.engine.isPlaying;
+    if (isPlaying != _wasPlaying) {
+      _wasPlaying = isPlaying;
+      _resetIdleTimer();
+      if (!isPlaying) {
+        if (!_toolbarsVisible) {
+          setState(() {
+            _toolbarsVisible = true;
+          });
+        }
       }
     }
   }
