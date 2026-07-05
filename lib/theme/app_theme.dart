@@ -61,7 +61,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: scheme.outlineVariant.withOpacity(isDark ? 0.6 : 0.8),
+            color: isDark ? const Color(0xFF333333) : scheme.outlineVariant.withValues(alpha: 0.8),
             width: 0.8,
           ),
         ),
@@ -69,7 +69,7 @@ class AppTheme {
         clipBehavior: Clip.antiAlias,
       ),
       dividerTheme: DividerThemeData(
-        color: scheme.outlineVariant.withOpacity(isDark ? 0.6 : 0.8),
+        color: isDark ? const Color(0xFF2C2C2C) : scheme.outlineVariant.withValues(alpha: 0.8),
         thickness: 0.8,
         space: 1,
       ),
@@ -88,7 +88,7 @@ class AppTheme {
         style: ButtonStyle(
           elevation: WidgetStateProperty.all(0),
           side: WidgetStateProperty.all(BorderSide(
-            color: scheme.outlineVariant.withOpacity(isDark ? 0.6 : 0.8),
+            color: isDark ? const Color(0xFF333333) : scheme.outlineVariant.withValues(alpha: 0.8),
             width: 0.8,
           )),
           shape: WidgetStateProperty.all(

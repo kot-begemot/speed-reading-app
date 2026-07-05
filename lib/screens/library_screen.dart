@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -427,6 +429,32 @@ class _ContinueCard extends StatelessWidget {
   final VoidCallback onOpen;
   const _ContinueCard({required this.book, required this.onOpen});
 
+  Widget _buildFallbackThumbnail(BuildContext context, String title, ColorScheme scheme) {
+    final char = title.trim().isNotEmpty ? title.trim()[0].toUpperCase() : '?';
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            scheme.surfaceContainerHighest.withValues(alpha: 0.4),
+            scheme.surfaceContainerHighest.withValues(alpha: 0.1),
+          ],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        char,
+        style: TextStyle(
+          fontFamily: 'serif',
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -435,66 +463,70 @@ class _ContinueCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      color: isDark
-          ? scheme.primary.withValues(alpha: 0.06)
-          : scheme.primary.withValues(alpha: 0.04),
+      color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.6 : 0.8),
+          color: isDark ? const Color(0xFF333333) : scheme.outlineVariant.withValues(alpha: 0.8),
           width: 0.8,
         ),
       ),
       child: InkWell(
         onTap: onOpen,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 72,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: scheme.primary,
-                  boxShadow: [
-                    BoxShadow(
-                      color: scheme.primary.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: isDark ? const Color(0xFF151515) : const Color(0xFFF1F3F5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: scheme.outlineVariant.withValues(alpha: isDark ? 0.5 : 0.7),
+                    width: 0.8,
+                  ),
                 ),
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: 26,
-                  color: scheme.onPrimary,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: book.coverImagePath != null &&
+                          File(book.coverImagePath!).existsSync()
+                      ? Image.file(
+                          File(book.coverImagePath!),
+                          fit: BoxFit.cover,
+                        )
+                      : _buildFallbackThumbnail(context, book.title, scheme),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       book.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        letterSpacing: -0.2,
                         height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       book.author,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
+                        color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -502,7 +534,7 @@ class _ContinueCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                             child: LinearProgressIndicator(
                               value: book.progress,
-                              minHeight: 4,
+                              minHeight: 3.5,
                               backgroundColor: scheme.outlineVariant.withValues(
                                 alpha: isDark ? 0.3 : 0.5,
                               ),
@@ -510,17 +542,38 @@ class _ContinueCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Text(
                           '${(book.progress * 100).round()}%',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: scheme.primary,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
                           ),
                         ),
                       ],
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark
+                      ? scheme.primary.withValues(alpha: 0.15)
+                      : scheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: scheme.primary.withValues(alpha: isDark ? 0.35 : 0.25),
+                    width: 0.8,
+                  ),
+                ),
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  size: 22,
+                  color: scheme.primary,
                 ),
               ),
             ],
