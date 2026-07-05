@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,6 +26,41 @@ class BookDetailsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          if (book.coverImagePath != null &&
+              File(book.coverImagePath!).existsSync()) ...[
+            Center(
+              child: Container(
+                height: 180,
+                width: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(
+                        theme.brightness == Brightness.dark ? 0.4 : 0.1,
+                      ),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant.withOpacity(
+                      theme.brightness == Brightness.dark ? 0.3 : 0.6,
+                    ),
+                    width: 0.8,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(book.coverImagePath!),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           Text(book.title, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(book.author, style: theme.textTheme.titleMedium),
