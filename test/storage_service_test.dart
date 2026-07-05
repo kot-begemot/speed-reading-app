@@ -80,4 +80,33 @@ void main() {
     expect(m.title, 'Renamed');
     expect(m.progress, closeTo(0.75, 1e-9));
   });
+
+  test('coverImagePath resolves dynamically across sandbox restarts', () async {
+    final storage = await StorageService.open(docsDir: tmp);
+    final meta = sample('d');
+    meta.coverImagePath = '/old_sandbox_dir/books/d.cover';
+    await storage.addBook(meta, 'test text');
+
+    // Simulate restart with a new tmp/sandbox path
+    final newTmp = await Directory.systemTemp.createTemp('srtest_new');
+    
+    // Copy the box file/directory to newTmp to simulate Hive database migration
+    await Hive.close();
+    final oldBoxFile = File(p.join(tmp.path, 'hive', 'books.hive'));
+    final newBoxDir = Directory(p.join(newTmp.path, 'hive'));
+    if (!newBoxDir.existsSync()) newBoxDir.createSync(recursive: true);
+    if (oldBoxFile.existsSync()) {
+      await oldBoxFile.copy(p.join(newBoxDir.path, 'books.hive'));
+    }
+
+    final storage2 = await StorageService.open(docsDir: newTmp);
+    final loaded = storage2.getBook('d')!;
+    
+    // Verify that the coverImagePath was updated to point to the new directory!
+    expect(loaded.coverImagePath, p.join(newTmp.path, 'books', 'd.cover'));
+    
+    // Clean up
+    await Hive.close();
+    if (newTmp.existsSync()) newTmp.deleteSync(recursive: true);
+  });
 }
