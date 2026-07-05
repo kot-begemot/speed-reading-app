@@ -148,9 +148,32 @@ The reading experience and persistence are easiest to confirm by hand:
 3. Read partway, exit the reader, fully close the app, reopen it and open the
    same book — it resumes exactly where you left off.
 
+
+---
+
+## Collaboration & Multi-Platform Guidelines
+
+### 1. Platform Permissions
+- **iOS**: Permissions must be declared in [`ios/Runner/Info.plist`](file:///Users/a/Desktop/Projects/Apps/speed-reading-app/ios/Runner/Info.plist) (e.g., file access, document import, notifications).
+- **Android**: Permissions are declared in `android/app/src/main/AndroidManifest.xml`.
+- **Note**: If a new feature requires native permissions, both files must be updated with the respective platform-specific configuration to keep builds functional on both platforms.
+
+### 2. Xcode Code Signing in Git
+- Xcode stores code signing configurations (like `DEVELOPMENT_TEAM` and provisioning profiles) in [`ios/Runner.xcodeproj/project.pbxproj`](file:///Users/a/Desktop/Projects/Apps/speed-reading-app/ios/Runner.xcodeproj/project.pbxproj).
+- **To avoid committing your personal Team ID/credentials**:
+  - Do **not** commit signing configurations to the shared repository.
+  - Nobody cares about your personal team id and Apple certificates, but it's an extra step to change after failed build, so we don't commit them.
+  - You can selectively stage files and exclude signing modifications using `git add -p` or the source control panel in your IDE (reverting signing settings before committing).
+  - Alternatively, you can tell git to temporarily ignore local changes to the project file using:
+    ```bash
+    git update-index --assume-unchanged ios/Runner.xcodeproj/project.pbxproj
+    ```
+    *(To track changes again when adding new files to Xcode, run: `git update-index --no-assume-unchanged ios/Runner.xcodeproj/project.pbxproj`)*
+
 ---
 
 ## Known limitations (post-MVP)
+
 
 These are intentionally out of the first version (see the spec's MVP scope):
 
