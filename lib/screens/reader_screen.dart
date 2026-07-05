@@ -322,7 +322,7 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
                     _handleUserInteraction();
                     showQuickReaderSettings(context);
                   },
-                  color: colors.currentWord,
+                  color: colors.currentWord.withValues(alpha: 0.85),
                 ),
               ],
             ),

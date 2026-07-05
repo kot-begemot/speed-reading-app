@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/reader_settings.dart';
@@ -55,10 +56,22 @@ String? readerFontFamily(ReaderFontType type) {
     case ReaderFontType.system:
       return null;
     case ReaderFontType.serif:
+      if (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS) {
+        return 'Georgia';
+      }
       return 'serif';
     case ReaderFontType.sans:
+      if (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS) {
+        return 'Helvetica';
+      }
       return 'sans-serif';
     case ReaderFontType.monospace:
+      if (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS) {
+        return 'Courier';
+      }
       return 'monospace';
   }
 }
