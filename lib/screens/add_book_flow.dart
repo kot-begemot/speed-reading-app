@@ -19,9 +19,9 @@ Future<void> runAddBookFlow(BuildContext context, WidgetRef ref) async {
 
   switch (source) {
     case _AddSource.file:
-      await _importFromFile(context, ref);
+      await importFromFile(context, ref);
     case _AddSource.link:
-      await _importFromLink(context, ref);
+      await importFromLink(context, ref);
   }
 }
 
@@ -57,7 +57,7 @@ class _SourceSheet extends StatelessWidget {
 
 // --- File import ---
 
-Future<void> _importFromFile(BuildContext context, WidgetRef ref) async {
+Future<void> importFromFile(BuildContext context, WidgetRef ref) async {
   FilePickerResult? picked;
   try {
     picked = await FilePicker.pickFiles(
@@ -86,7 +86,7 @@ Future<void> _importFromFile(BuildContext context, WidgetRef ref) async {
 
 // --- URL import ---
 
-Future<void> _importFromLink(BuildContext context, WidgetRef ref) async {
+Future<void> importFromLink(BuildContext context, WidgetRef ref) async {
   final url = await _promptUrl(context);
   if (url == null || url.trim().isEmpty || !context.mounted) return;
 
