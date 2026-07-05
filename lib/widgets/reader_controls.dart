@@ -11,56 +11,68 @@ class ReaderControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              tooltip: 'Restart',
-              icon: const Icon(Icons.replay),
-              onPressed: engine.restart,
-            ),
-            IconButton(
-              tooltip: 'Previous sentence',
-              icon: const Icon(Icons.skip_previous),
-              onPressed: engine.prevSentence,
-            ),
-            IconButton(
-              tooltip: 'Back 5s',
-              icon: const Icon(Icons.replay_5),
-              onPressed: engine.back5s,
-            ),
-            ValueListenableBuilder(
-              valueListenable: engine.state,
-              builder: (context, state, _) {
-                return IconButton.filled(
-                  iconSize: 36,
+    final scheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            tooltip: 'Restart',
+            icon: Icon(Icons.replay_rounded, color: scheme.onSurfaceVariant),
+            onPressed: engine.restart,
+          ),
+          IconButton(
+            tooltip: 'Previous sentence',
+            icon: Icon(Icons.skip_previous_rounded, color: scheme.onSurfaceVariant),
+            onPressed: engine.prevSentence,
+          ),
+          IconButton(
+            tooltip: 'Back 5s',
+            icon: Icon(Icons.replay_5_rounded, color: scheme.onSurfaceVariant),
+            onPressed: engine.back5s,
+          ),
+          ValueListenableBuilder(
+            valueListenable: engine.state,
+            builder: (context, state, _) {
+              final isDark = theme.brightness == Brightness.dark;
+              return Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark
+                      ? scheme.primary.withValues(alpha: 0.15)
+                      : scheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: scheme.primary.withValues(alpha: isDark ? 0.35 : 0.25),
+                    width: 0.8,
+                  ),
+                ),
+                child: IconButton(
+                  iconSize: 26,
                   tooltip: state.isPlaying ? 'Pause' : 'Play',
                   icon: Icon(
-                      state.isPlaying ? Icons.pause : Icons.play_arrow),
-                  onPressed: engine.toggle,
-                  style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
+                    state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    color: scheme.primary,
                   ),
-                );
-              },
-            ),
-            IconButton(
-              tooltip: 'Forward 5s',
-              icon: const Icon(Icons.forward_5),
-              onPressed: engine.forward5s,
-            ),
-            IconButton(
-              tooltip: 'Next sentence',
-              icon: const Icon(Icons.skip_next),
-              onPressed: engine.nextSentence,
-            ),
-          ],
-        ),
+                  onPressed: engine.toggle,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: 'Forward 5s',
+            icon: Icon(Icons.forward_5_rounded, color: scheme.onSurfaceVariant),
+            onPressed: engine.forward5s,
+          ),
+          IconButton(
+            tooltip: 'Next sentence',
+            icon: Icon(Icons.skip_next_rounded, color: scheme.onSurfaceVariant),
+            onPressed: engine.nextSentence,
+          ),
+        ],
       ),
     );
   }
