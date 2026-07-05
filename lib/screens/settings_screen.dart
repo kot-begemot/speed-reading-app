@@ -79,7 +79,6 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
-          _SettingsLivePreview(settings: settings),
           _buildSection(
             'Reading Profile',
             theme,
@@ -94,6 +93,7 @@ class SettingsScreen extends ConsumerWidget {
             'Typography & Layout',
             theme,
             [
+              _SettingsLivePreview(settings: settings),
               SettingTile(
                 title: 'Font family',
                 subtitle: 'Choose reader font style',
@@ -349,14 +349,9 @@ class _SettingsLivePreview extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF2C2C2C) : scheme.outlineVariant.withValues(alpha: 0.6),
-          width: 0.8,
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
