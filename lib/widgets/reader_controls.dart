@@ -45,29 +45,30 @@ class ReaderControls extends StatelessWidget {
                 onPressed: engine.back5s,
               ),
               const SizedBox(width: 16),
-              // Large play/pause outline circle button
+              // Large play/pause solid hero circle button
               ValueListenableBuilder(
                 valueListenable: engine.state,
                 builder: (context, state, _) {
                   return Container(
-                    width: 52,
-                    height: 52,
+                    width: 54,
+                    height: 54,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isDark
-                          ? scheme.primary.withValues(alpha: 0.15)
-                          : scheme.primary.withValues(alpha: 0.08),
-                      border: Border.all(
-                        color: scheme.primary.withValues(alpha: isDark ? 0.35 : 0.25),
-                        width: 0.8,
-                      ),
+                      color: scheme.primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: scheme.primary.withValues(alpha: isDark ? 0.4 : 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: IconButton(
-                      iconSize: 26,
+                      iconSize: 28,
                       tooltip: state.isPlaying ? 'Pause' : 'Play',
                       icon: Icon(
                         state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                        color: scheme.primary,
+                        color: scheme.onPrimary,
                       ),
                       onPressed: engine.toggle,
                     ),
