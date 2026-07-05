@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/reader_settings.dart';
 import '../providers/settings_provider.dart';
+import '../theme/reader_colors.dart';
 import '../widgets/setting_row.dart';
 import 'color_settings_screen.dart';
 
@@ -78,6 +79,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
+          _SettingsLivePreview(settings: settings),
           _buildSection(
             'Reading Profile',
             theme,
@@ -282,6 +284,179 @@ class _WpmControlState extends State<_WpmControl> {
         value: widget.value.toDouble(),
         label: '${widget.value} WPM',
         onChanged: (v) => widget.onChanged(v.round()),
+      ),
+    );
+  }
+}
+
+class _SettingsLivePreview extends StatelessWidget {
+  final ReaderSettings settings;
+  const _SettingsLivePreview({required this.settings});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final colors = ReaderColors.resolve(settings, scheme);
+    final fontFamily = readerFontFamily(settings.fontType);
+
+    final focusTextStyle = TextStyle(
+      fontSize: settings.fontSize,
+      fontWeight: FontWeight.w700,
+      color: colors.currentWord,
+      fontFamily: fontFamily,
+    );
+
+    final String prefixText;
+    final String orpWordPrefix;
+    final String orpLetter;
+    final String orpWordSuffix;
+    final String suffixText;
+
+    switch (settings.wordsPerEntry) {
+      case 1:
+        prefixText = '';
+        orpWordPrefix = 'Re';
+        orpLetter = 'a';
+        orpWordSuffix = 'der';
+        suffixText = '';
+      case 2:
+        prefixText = 'Speed ';
+        orpWordPrefix = 're';
+        orpLetter = 'a';
+        orpWordSuffix = 'der';
+        suffixText = '';
+      case 3:
+        prefixText = 'Super ';
+        orpWordPrefix = 're';
+        orpLetter = 'a';
+        orpWordSuffix = 'der';
+        suffixText = ' app';
+      case 4:
+        prefixText = 'Our super ';
+        orpWordPrefix = 're';
+        orpLetter = 'a';
+        orpWordSuffix = 'der';
+        suffixText = ' app';
+      case 5:
+      default:
+        prefixText = 'This is our ';
+        orpWordPrefix = 're';
+        orpLetter = 'a';
+        orpWordSuffix = 'der';
+        suffixText = ' app';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      decoration: BoxDecoration(
+        color: colors.background,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF2C2C2C) : scheme.outlineVariant.withValues(alpha: 0.6),
+          width: 0.8,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Focus section preview
+          Container(
+            color: colors.focusBackground,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                // Top guide line
+                Container(
+                  width: 160,
+                  height: 1.5,
+                  color: colors.guideLine,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: focusTextStyle,
+                      children: [
+                        if (prefixText.isNotEmpty)
+                          TextSpan(text: prefixText),
+                        TextSpan(text: orpWordPrefix),
+                        TextSpan(
+                          text: orpLetter,
+                          style: focusTextStyle.copyWith(color: colors.centralLetter),
+                        ),
+                        TextSpan(text: orpWordSuffix),
+                        if (suffixText.isNotEmpty)
+                          TextSpan(text: suffixText),
+                      ],
+                    ),
+                  ),
+                ),
+                // Bottom guide line
+                Container(
+                  width: 160,
+                  height: 1.5,
+                  color: colors.guideLine,
+                ),
+              ],
+            ),
+          ),
+          // Helper section preview
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.fastOutSlowIn,
+            child: settings.showHelperText
+                ? Column(
+                    children: [
+                      const Divider(height: 1),
+                      Container(
+                        color: colors.background,
+                        padding: const EdgeInsets.all(16),
+                        width: double.infinity,
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 13,
+                              height: 1.4,
+                              fontFamily: fontFamily,
+                              color: colors.currentWord.withValues(alpha: 0.8),
+                            ),
+                            children: [
+                              const TextSpan(text: 'This is a typography preview showing the '),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: colors.helperHighlight,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'helper panel',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark ? Colors.black : Colors.white,
+                                      fontFamily: fontFamily,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: ' when reading.'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
       ),
     );
   }
