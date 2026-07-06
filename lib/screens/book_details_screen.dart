@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/book_meta.dart';
 import '../providers/books_provider.dart';
+import '../widgets/rename_dialog.dart';
 import 'reader_screen.dart';
 
 /// Book metadata + actions (spec §1, §7): open, rename, reset progress, remove.
@@ -24,6 +27,41 @@ class BookDetailsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          if (book.coverImagePath != null &&
+              File(book.coverImagePath!).existsSync()) ...[
+            Center(
+              child: Container(
+                height: 180,
+                width: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(
+                        theme.brightness == Brightness.dark ? 0.4 : 0.1,
+                      ),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant.withOpacity(
+                      theme.brightness == Brightness.dark ? 0.3 : 0.6,
+                    ),
+                    width: 0.8,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(book.coverImagePath!),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           Text(book.title, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(book.author, style: theme.textTheme.titleMedium),
@@ -71,28 +109,10 @@ class BookDetailsScreen extends ConsumerWidget {
 
   Future<void> _rename(
       BuildContext context, WidgetRef ref, BookMeta book) async {
-    final controller = TextEditingController(text: book.title);
     final result = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rename'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Title'),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(controller.text),
-              child: const Text('Save')),
-        ],
-      ),
+      builder: (ctx) => RenameDialog(initialValue: book.title),
     );
-    controller.dispose();
     final trimmed = result?.trim();
     if (trimmed != null && trimmed.isNotEmpty && trimmed != book.title) {
       await ref.read(booksProvider.notifier).rename(book.id, trimmed);

@@ -27,6 +27,7 @@ class SettingsNotifier extends Notifier<ReaderSettings> {
   void setFontType(ReaderFontType value) =>
       update(state.copyWith(fontType: value));
   void setFontSize(double value) => update(state.copyWith(fontSize: value));
+  void setHelperFontSize(double value) => update(state.copyWith(helperFontSize: value));
   void setWordsPerEntry(int value) =>
       update(state.copyWith(wordsPerEntry: value));
   void setShowHelperText(bool value) =>
@@ -34,22 +35,41 @@ class SettingsNotifier extends Notifier<ReaderSettings> {
   void setThemeMode(ThemeMode value) =>
       update(state.copyWith(themeMode: value));
 
-  void setColor(ReaderColorSlot slot, Color color) {
-    switch (slot) {
-      case ReaderColorSlot.currentWord:
-        update(state.copyWith(currentWordColor: color));
-      case ReaderColorSlot.centralLetter:
-        update(state.copyWith(centralLetterColor: color));
-      case ReaderColorSlot.guideLine:
-        update(state.copyWith(guideLineColor: color));
-      case ReaderColorSlot.helperHighlight:
-        update(state.copyWith(helperHighlightColor: color));
-      case ReaderColorSlot.background:
-        update(state.copyWith(backgroundColor: color));
-      case ReaderColorSlot.focusBackground:
-        update(state.copyWith(focusBackgroundColor: color));
-      case ReaderColorSlot.progressBar:
-        update(state.copyWith(progressBarColor: color));
+  void setColor(ReaderColorSlot slot, Color color, {bool isDark = false}) {
+    if (isDark) {
+      switch (slot) {
+        case ReaderColorSlot.currentWord:
+          update(state.copyWith(currentWordColorDark: color));
+        case ReaderColorSlot.centralLetter:
+          update(state.copyWith(centralLetterColorDark: color));
+        case ReaderColorSlot.guideLine:
+          update(state.copyWith(guideLineColorDark: color));
+        case ReaderColorSlot.helperHighlight:
+          update(state.copyWith(helperHighlightColorDark: color));
+        case ReaderColorSlot.background:
+          update(state.copyWith(backgroundColorDark: color));
+        case ReaderColorSlot.focusBackground:
+          update(state.copyWith(focusBackgroundColorDark: color));
+        case ReaderColorSlot.progressBar:
+          update(state.copyWith(progressBarColorDark: color));
+      }
+    } else {
+      switch (slot) {
+        case ReaderColorSlot.currentWord:
+          update(state.copyWith(currentWordColorLight: color));
+        case ReaderColorSlot.centralLetter:
+          update(state.copyWith(centralLetterColorLight: color));
+        case ReaderColorSlot.guideLine:
+          update(state.copyWith(guideLineColorLight: color));
+        case ReaderColorSlot.helperHighlight:
+          update(state.copyWith(helperHighlightColorLight: color));
+        case ReaderColorSlot.background:
+          update(state.copyWith(backgroundColorLight: color));
+        case ReaderColorSlot.focusBackground:
+          update(state.copyWith(focusBackgroundColorLight: color));
+        case ReaderColorSlot.progressBar:
+          update(state.copyWith(progressBarColorLight: color));
+      }
     }
   }
 

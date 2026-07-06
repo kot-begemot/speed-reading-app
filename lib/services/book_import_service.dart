@@ -69,8 +69,21 @@ class BookImportService {
     }
 
     final now = DateTime.now();
+    final bookId = _uuid.v4();
+
+    String? coverImagePath;
+    if (parsed.coverBytes != null && parsed.coverBytes!.isNotEmpty) {
+      try {
+        final cf = storage.coverFile(bookId);
+        await cf.writeAsBytes(parsed.coverBytes!);
+        coverImagePath = cf.path;
+      } catch (_) {
+        // Ignore cover write failure.
+      }
+    }
+
     final meta = BookMeta(
-      id: _uuid.v4(),
+      id: bookId,
       title: title,
       author: author,
       sourceFilePath: file.path,
@@ -78,6 +91,7 @@ class BookImportService {
       totalWords: totalWords,
       addedAt: now,
       lastOpenedAt: now,
+      coverImagePath: coverImagePath,
     );
     await storage.addBook(meta, text);
     return ImportResult(ImportStatus.success, book: meta);
