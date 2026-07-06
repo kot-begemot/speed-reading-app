@@ -24,7 +24,7 @@ class SettingTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -34,12 +34,24 @@ class SettingTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: theme.textTheme.titleMedium),
+                      Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
                       if (subtitle != null) ...[
-                        const SizedBox(height: 2),
-                        Text(subtitle!,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant)),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.75),
+                            fontSize: 12,
+                            height: 1.2,
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -48,7 +60,7 @@ class SettingTile extends StatelessWidget {
               ],
             ),
             if (below != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               below!,
             ],
           ],

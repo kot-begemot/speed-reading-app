@@ -5,6 +5,7 @@ import 'package:archive/archive.dart';
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:epubx/epubx.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:image/image.dart' as img;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 /// Result of parsing a file into clean text plus any metadata we could extract.
@@ -12,7 +13,13 @@ class ParsedBook {
   final String text;
   final String? title;
   final String? author;
-  const ParsedBook({required this.text, this.title, this.author});
+  final List<int>? coverBytes;
+  const ParsedBook({
+    required this.text,
+    this.title,
+    this.author,
+    this.coverBytes,
+  });
 }
 
 /// Thrown when a file can't be read/parsed at all (→ "File unreadable" state).
@@ -191,7 +198,29 @@ class TextParserService {
       }
       final text = buffer.toString().trim();
       if (text.isNotEmpty) {
-        return ParsedBook(text: text, title: book.Title, author: book.Author);
+        List<int>? coverBytes;
+        try {
+          final coverImage = book.CoverImage;
+          if (coverImage != null) {
+            coverBytes = img.encodePng(coverImage);
+          } else {
+            final images = book.Content?.Images;
+            if (images != null && images.isNotEmpty) {
+              final firstImage = images.values.first;
+              if (firstImage.Content != null && firstImage.Content!.isNotEmpty) {
+                coverBytes = firstImage.Content;
+              }
+            }
+          }
+        } catch (_) {
+          // Keep importing even if cover parsing fails.
+        }
+        return ParsedBook(
+          text: text,
+          title: book.Title,
+          author: book.Author,
+          coverBytes: coverBytes,
+        );
       }
       // Parsed but empty → try the manual fallback below.
     } catch (_) {

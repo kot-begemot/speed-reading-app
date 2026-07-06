@@ -31,25 +31,41 @@ class ReaderProgressBar extends StatelessWidget {
         currentWordIndex, totalWords, wordsPerMinute);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Time left: ${_fmt(left)}',
-                  style: theme.textTheme.labelMedium),
-              Text('Time passed: ${_fmt(elapsed)}',
-                  style: theme.textTheme.labelMedium),
+              Text(
+                'Time left: ${_fmt(left)}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.currentWord.withValues(alpha: 0.65),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.1,
+                ),
+              ),
+              Text(
+                'Time passed: ${_fmt(elapsed)}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.currentWord.withValues(alpha: 0.65),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.1,
+                ),
+              ),
             ],
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
+              trackHeight: 2,
               activeTrackColor: colors.progressBar,
+              inactiveTrackColor: colors.progressBar.withValues(alpha: 0.15),
               thumbColor: colors.progressBar,
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+              overlayColor: colors.progressBar.withValues(alpha: 0.12),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
             ),
             child: Slider(
               value: progress.clamp(0.0, 1.0),

@@ -35,7 +35,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Speed Reader'), findsOneWidget);
-    expect(find.text('No books yet'), findsOneWidget);
+    expect(find.text('Your library is empty'), findsOneWidget);
     expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/book_meta.dart';
 import '../providers/books_provider.dart';
 import '../widgets/book_card.dart';
+import '../widgets/rename_dialog.dart';
 import 'add_book_flow.dart';
 import 'book_details_screen.dart';
 import 'reader_screen.dart';
@@ -22,6 +25,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
   final _searchController = TextEditingController();
   String _query = '';
+  bool _isAddMenuExpanded = false;
 
   @override
   void dispose() {
@@ -86,30 +90,10 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   }
 
   Future<void> _renameDialog(BookMeta book) async {
-    final controller = TextEditingController(text: book.title);
     final newTitle = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rename'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Title'),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (ctx) => RenameDialog(initialValue: book.title),
     );
-    controller.dispose();
     final trimmed = newTitle?.trim();
     if (trimmed != null && trimmed.isNotEmpty && trimmed != book.title) {
       await ref.read(booksProvider.notifier).rename(book.id, trimmed);
@@ -143,6 +127,9 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final books = ref.watch(booksProvider);
     // The search bar only appears once the library is large enough to need it.
     final showSearch = books.length >= _searchThreshold;
@@ -152,7 +139,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Speed Reader'),
+        title: Text(
+          'Speed Reader',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -163,10 +156,110 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => runAddBookFlow(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text('Add book'),
+      floatingActionButton: Material(
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
+        borderRadius: BorderRadius.circular(24),
+        color: scheme.surface,
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDark ? const Color(0xFF333333) : scheme.outlineVariant.withValues(alpha: 0.8),
+              width: 0.8,
+            ),
+          ),
+          child: AnimatedCrossFade(
+            duration: const Duration(milliseconds: 250),
+            firstCurve: Curves.easeInOutCubic,
+            secondCurve: Curves.easeInOutCubic,
+            sizeCurve: Curves.easeInOutCubic,
+            crossFadeState: _isAddMenuExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: InkWell(
+              onTap: () => setState(() => _isAddMenuExpanded = true),
+              borderRadius: BorderRadius.circular(24),
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Container(
+                width: 140,
+                height: 48,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_rounded, size: 20, color: scheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Add book',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onSurface,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            secondChild: Container(
+              width: 208,
+              height: 48,
+              alignment: Alignment.center,
+              child: OverflowBox(
+                minWidth: 208,
+                maxWidth: 208,
+                minHeight: 48,
+                maxHeight: 48,
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 4),
+                  child: Row(
+                    children: [
+                      _FABOption(
+                        icon: Icons.folder_open_rounded,
+                        label: 'File',
+                        onTap: () {
+                          setState(() => _isAddMenuExpanded = false);
+                          importFromFile(context, ref);
+                        },
+                        scheme: scheme,
+                      ),
+                      _FABDivider(scheme: scheme, isDark: isDark),
+                      _FABOption(
+                        icon: Icons.link_rounded,
+                        label: 'Link',
+                        onTap: () {
+                          setState(() => _isAddMenuExpanded = false);
+                          importFromLink(context, ref);
+                        },
+                        scheme: scheme,
+                      ),
+                      const Spacer(),
+                      _FABDivider(scheme: scheme, isDark: isDark),
+                      IconButton(
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        icon: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        ),
+                        onPressed: () => setState(() => _isAddMenuExpanded = false),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -209,23 +302,42 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
   Widget _emptyState(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.library_books_outlined,
-            size: 64,
-            color: theme.colorScheme.outline,
-          ),
-          const SizedBox(height: 12),
-          Text('No books yet', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            'Tap “Add book” to import one',
-            style: theme.textTheme.bodySmall,
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: scheme.primary.withOpacity(0.05),
+              ),
+              child: Icon(
+                Icons.library_books_outlined,
+                size: 44,
+                color: scheme.primary.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Your library is empty',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Import e-books or text files and start speed reading today.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurfaceVariant.withOpacity(0.8),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -287,11 +399,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
   Widget _sectionHeader(ThemeData theme, String title) => SliverToBoxAdapter(
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
         ),
       ),
     ),
@@ -303,65 +416,213 @@ class _ContinueCard extends StatelessWidget {
   final VoidCallback onOpen;
   const _ContinueCard({required this.book, required this.onOpen});
 
+  Widget _buildFallbackThumbnail(BuildContext context, String title, ColorScheme scheme) {
+    final char = title.trim().isNotEmpty ? title.trim()[0].toUpperCase() : '?';
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            scheme.surfaceContainerHighest.withValues(alpha: 0.4),
+            scheme.surfaceContainerHighest.withValues(alpha: 0.1),
+          ],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        char,
+        style: TextStyle(
+          fontFamily: 'serif',
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
       clipBehavior: Clip.antiAlias,
-      color: scheme.primaryContainer,
+      color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isDark ? const Color(0xFF333333) : scheme.outlineVariant.withValues(alpha: 0.8),
+          width: 0.8,
+        ),
+      ),
       child: InkWell(
         onTap: onOpen,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              Icon(
-                Icons.play_circle_fill,
-                size: 44,
-                color: scheme.onPrimaryContainer,
+              Container(
+                width: 48,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF151515) : const Color(0xFFF1F3F5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: scheme.outlineVariant.withValues(alpha: isDark ? 0.5 : 0.7),
+                    width: 0.8,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: book.coverImagePath != null &&
+                          File(book.coverImagePath!).existsSync()
+                      ? Image.file(
+                          File(book.coverImagePath!),
+                          fit: BoxFit.cover,
+                        )
+                      : _buildFallbackThumbnail(context, book.title, scheme),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       book.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: scheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        letterSpacing: -0.2,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       book.author,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: scheme.onPrimaryContainer.withValues(alpha: 0.8),
+                        color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: LinearProgressIndicator(
-                        value: book.progress,
-                        minHeight: 5,
-                        backgroundColor: scheme.onPrimaryContainer.withValues(
-                          alpha: 0.2,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              value: book.progress,
+                              minHeight: 3.5,
+                              backgroundColor: scheme.outlineVariant.withValues(
+                                alpha: isDark ? 0.3 : 0.5,
+                              ),
+                              valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        Text(
+                          '${(book.progress * 100).round()}%',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scheme.primary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark
+                      ? scheme.primary.withValues(alpha: 0.15)
+                      : scheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: scheme.primary.withValues(alpha: isDark ? 0.35 : 0.25),
+                    width: 0.8,
+                  ),
+                ),
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  size: 22,
+                  color: scheme.primary,
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FABOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final ColorScheme scheme;
+
+  const _FABOption({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.scheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: scheme.primary),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FABDivider extends StatelessWidget {
+  final ColorScheme scheme;
+  final bool isDark;
+
+  const _FABDivider({required this.scheme, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 0.8,
+      height: 20,
+      color: scheme.outlineVariant.withValues(alpha: isDark ? 0.6 : 0.8),
     );
   }
 }

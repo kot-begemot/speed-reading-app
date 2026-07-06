@@ -41,9 +41,28 @@ class StorageService {
   File _textFile(String id) => File(p.join(_booksDir.path, '$id.txt'));
   File coverFile(String id) => File(p.join(_booksDir.path, '$id.cover'));
 
-  List<BookMeta> getAllBooks() => _box.values.toList();
+  List<BookMeta> getAllBooks() {
+    final list = _box.values.toList();
+    for (final book in list) {
+      _resolveCoverPath(book);
+    }
+    return list;
+  }
 
-  BookMeta? getBook(String id) => _box.get(id);
+  BookMeta? getBook(String id) {
+    final book = _box.get(id);
+    if (book != null) {
+      _resolveCoverPath(book);
+    }
+    return book;
+  }
+
+  void _resolveCoverPath(BookMeta book) {
+    if (book.coverImagePath != null && book.coverImagePath!.isNotEmpty) {
+      final filename = p.basename(book.coverImagePath!);
+      book.coverImagePath = p.join(_booksDir.path, filename);
+    }
+  }
 
   /// Persists a new book: writes its text to disk, then the metadata record.
   Future<void> addBook(BookMeta meta, String text) async {
