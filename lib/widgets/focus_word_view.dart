@@ -44,13 +44,14 @@ class FocusWordView extends StatelessWidget {
   }
 
   Widget _buildWord(TextStyle baseStyle) {
-    if (groupWords.isEmpty) {
+    final filteredWords = groupWords.where((w) => !(w.startsWith('[IMAGE:') && w.endsWith(']'))).toList();
+    if (filteredWords.isEmpty) {
       return Text('—', style: baseStyle, textAlign: TextAlign.center);
     }
     // Central-letter highlight only makes sense for a single word (the ORP is a
     // fixed point). Groups render plain and centered.
-    if (groupWords.length == 1) {
-      final word = groupWords.first;
+    if (filteredWords.length == 1) {
+      final word = filteredWords.first;
       final i = CentralLetterCalculator.indexFor(word).clamp(0, word.length - 1);
       return RichText(
         textAlign: TextAlign.center,
@@ -68,7 +69,7 @@ class FocusWordView extends StatelessWidget {
       );
     }
     return Text(
-      groupWords.join(' '),
+      filteredWords.join(' '),
       style: baseStyle,
       textAlign: TextAlign.center,
     );

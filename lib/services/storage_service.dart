@@ -40,6 +40,9 @@ class StorageService {
 
   File _textFile(String id) => File(p.join(_booksDir.path, '$id.txt'));
   File coverFile(String id) => File(p.join(_booksDir.path, '$id.cover'));
+  File imageFile(String id, String filename) => File(p.join(_booksDir.path, '${id}_img_$filename'));
+
+  String get booksDirPath => _booksDir.path;
 
   List<BookMeta> getAllBooks() {
     final list = _box.values.toList();
@@ -104,5 +107,17 @@ class StorageService {
     if (tf.existsSync()) await tf.delete();
     final cf = coverFile(id);
     if (cf.existsSync()) await cf.delete();
+
+    try {
+      if (_booksDir.existsSync()) {
+        final prefix = '${id}_img_';
+        final files = _booksDir.listSync();
+        for (final entity in files) {
+          if (entity is File && p.basename(entity.path).startsWith(prefix)) {
+            await entity.delete();
+          }
+        }
+      }
+    } catch (_) {}
   }
 }
