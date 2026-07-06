@@ -18,11 +18,13 @@ void main() {
     n.setWordsPerMinute(450);
     n.setWordsPerEntry(3);
     n.setShowHelperText(false);
+    n.setHelperFontSize(22);
 
     final s = c.read(settingsProvider);
     expect(s.wordsPerMinute, 450);
     expect(s.wordsPerEntry, 3);
     expect(s.showHelperText, false);
+    expect(s.helperFontSize, 22);
   });
 
   test('setColor sets a concrete color; resetColors restores defaults only', () {

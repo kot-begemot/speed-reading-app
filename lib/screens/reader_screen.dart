@@ -8,10 +8,11 @@ import '../providers/books_provider.dart';
 import '../providers/reader_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/reader_colors.dart';
+import '../models/reader_settings.dart';
+import '../widgets/floating_reader_menu.dart';
 import '../widgets/focus_word_view.dart';
 import '../widgets/helper_text_view.dart';
 import '../widgets/quick_settings_modal.dart';
-import '../widgets/reader_controls.dart';
 import '../widgets/reader_progress_bar.dart';
 
 /// The split-view speed reader (spec §3): focus area on top, full-text helper
@@ -175,6 +176,9 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
     final landscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final menuBottomPadding = bottomPadding + (_toolbarsVisible ? 90.0 : 24.0);
+
     // --- Focus section ---
     final focusPanel = Container(
       color: colors.focusBackground,
@@ -225,32 +229,85 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
         engine: engine,
         text: session.text,
         colors: colors,
-        fontSize: settings.fontSize,
+        helperFontSize: settings.helperFontSize,
         fontFamily: fontFamily,
+        bottomPadding: menuBottomPadding,
       ),
     );
 
-    // Split by height in portrait, by width in landscape.
-    final Widget splitArea;
-    if (!settings.showHelperText) {
-      splitArea = focusPanel;
-    } else if (landscape) {
-      splitArea = Row(
-        children: [
-          Expanded(child: focusPanel),
-          const VerticalDivider(width: 1),
-          Expanded(child: helperPanel),
-        ],
-      );
-    } else {
-      splitArea = Column(
-        children: [
-          Expanded(child: focusPanel),
-          const Divider(height: 1),
-          Expanded(child: helperPanel),
-        ],
-      );
-    }
+    // Split by height in portrait, by width in landscape, animating toggle smoothly.
+    final Widget splitArea = LayoutBuilder(
+      builder: (context, constraints) {
+        final viewportHeight = constraints.maxHeight;
+        final viewportWidth = constraints.maxWidth;
+
+        if (landscape) {
+          return Row(
+            children: [
+              Expanded(child: focusPanel),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: SizedBox(
+                  width: settings.showHelperText ? 1.0 : 0.0,
+                  child: Container(
+                    width: 1.0,
+                    color: isDark ? const Color(0xFF222222) : scheme.outlineVariant.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: SizedBox(
+                  width: settings.showHelperText ? (viewportWidth / 2) : 0.0,
+                  child: ClipRect(
+                    child: OverflowBox(
+                      minWidth: 0.0,
+                      maxWidth: viewportWidth / 2,
+                      alignment: Alignment.centerLeft,
+                      child: helperPanel,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            children: [
+              Expanded(child: focusPanel),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: SizedBox(
+                  height: settings.showHelperText ? 1.0 : 0.0,
+                  child: Container(
+                    height: 1.0,
+                    color: isDark ? const Color(0xFF222222) : scheme.outlineVariant.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: SizedBox(
+                  height: settings.showHelperText ? (viewportHeight / 2) : 0.0,
+                  child: ClipRect(
+                    child: OverflowBox(
+                      minHeight: 0.0,
+                      maxHeight: viewportHeight / 2,
+                      alignment: Alignment.topCenter,
+                      child: helperPanel,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
 
     // Custom Top Bar with safe area padding
     final topPadding = MediaQuery.of(context).padding.top;
@@ -331,39 +388,6 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
       ),
     );
 
-    // Custom Bottom Bar with safe area padding
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final bottomBarHeight = 68.0 + bottomPadding;
-    final bottomBar = AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.fastOutSlowIn,
-      height: _toolbarsVisible ? bottomBarHeight : 0,
-      decoration: BoxDecoration(
-        color: colors.background,
-        border: Border(
-          top: BorderSide(
-            color: _toolbarsVisible 
-                ? (isDark ? const Color(0xFF222222) : scheme.outlineVariant.withValues(alpha: 0.6))
-                : Colors.transparent,
-            width: 0.8,
-          ),
-        ),
-      ),
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 200),
-        opacity: _toolbarsVisible ? 1.0 : 0.0,
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: Container(
-            height: bottomBarHeight,
-            padding: EdgeInsets.only(bottom: bottomPadding),
-            alignment: Alignment.center,
-            child: ReaderControls(engine: engine),
-          ),
-        ),
-      ),
-    );
-
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) _savePosition();
@@ -374,11 +398,37 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
           behavior: HitTestBehavior.translucent,
           onPointerDown: (_) => _handleUserInteraction(),
           onPointerMove: (_) => _handleUserInteraction(),
-          child: Column(
+          child: Stack(
             children: [
-              topBar,
-              Expanded(child: splitArea),
-              bottomBar,
+              Column(
+                children: [
+                  topBar,
+                  Expanded(child: splitArea),
+                ],
+              ),
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: bottomPadding + 16,
+                child: AnimatedSlide(
+                  offset: _toolbarsVisible ? Offset.zero : const Offset(0, 0.2),
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  child: AnimatedOpacity(
+                    opacity: _toolbarsVisible ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    child: IgnorePointer(
+                      ignoring: !_toolbarsVisible,
+                      child: FloatingReaderMenu(
+                        engine: engine,
+                        visible: _toolbarsVisible,
+                        onUserInteraction: _handleUserInteraction,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

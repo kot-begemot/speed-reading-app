@@ -7,6 +7,7 @@ void main() {
     const s = ReaderSettings();
     expect(s.wordsPerMinute, 300);
     expect(s.fontSize, 32);
+    expect(s.helperFontSize, 20);
     expect(s.wordsPerEntry, 1);
     expect(s.showHelperText, true);
     expect(s.themeMode, ThemeMode.system);
@@ -17,6 +18,7 @@ void main() {
       wordsPerMinute: 550,
       fontType: ReaderFontType.serif,
       fontSize: 48,
+      helperFontSize: 24,
       wordsPerEntry: 3,
       showHelperText: false,
       themeMode: ThemeMode.dark,

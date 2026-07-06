@@ -16,16 +16,18 @@ class HelperTextView extends StatefulWidget {
   final ReaderEngine engine;
   final TokenizedText text;
   final ReaderColors colors;
-  final double fontSize;
+  final double helperFontSize;
   final String? fontFamily;
+  final double bottomPadding;
 
   const HelperTextView({
     super.key,
     required this.engine,
     required this.text,
     required this.colors,
-    required this.fontSize,
+    required this.helperFontSize,
     required this.fontFamily,
+    required this.bottomPadding,
   });
 
   @override
@@ -89,7 +91,7 @@ class _HelperTextViewState extends State<HelperTextView> {
   /// negative, scrolling later lines into view so the highlight stays visible.
   double _targetAlignment(ParagraphSpan span, int activeWord) {
     if (_viewportWidth <= 0 || _viewportHeight <= 0) return _anchor;
-    final fontSize = widget.fontSize * 0.6; // matches helper text size
+    final fontSize = widget.helperFontSize; // matches helper text size
     final lineHeight = fontSize * 1.5; // matches the TextStyle height
     final avgCharWidth = fontSize * 0.52; // rough proportional-font estimate
     final textWidth = (_viewportWidth - 32).clamp(1.0, _viewportWidth);
@@ -134,13 +136,13 @@ class _HelperTextViewState extends State<HelperTextView> {
           initialScrollIndex: _activeParagraph,
           initialAlignment: _anchor,
           itemCount: paragraphs.length,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          padding: EdgeInsets.fromLTRB(16, 12, 16, widget.bottomPadding),
           itemBuilder: (context, i) => _HelperParagraph(
             engine: widget.engine,
             text: widget.text,
             span: paragraphs[i],
             colors: widget.colors,
-            fontSize: widget.fontSize,
+            helperFontSize: widget.helperFontSize,
             fontFamily: widget.fontFamily,
           ),
         );
@@ -154,7 +156,7 @@ class _HelperParagraph extends StatefulWidget {
   final TokenizedText text;
   final ParagraphSpan span;
   final ReaderColors colors;
-  final double fontSize;
+  final double helperFontSize;
   final String? fontFamily;
 
   const _HelperParagraph({
@@ -162,7 +164,7 @@ class _HelperParagraph extends StatefulWidget {
     required this.text,
     required this.span,
     required this.colors,
-    required this.fontSize,
+    required this.helperFontSize,
     required this.fontFamily,
   });
 
@@ -215,7 +217,7 @@ class _HelperParagraphState extends State<_HelperParagraph> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final base = TextStyle(
-      fontSize: widget.fontSize * 0.6, // helper text is smaller than focus
+      fontSize: widget.helperFontSize,
       fontFamily: widget.fontFamily,
       height: 1.5,
       color: theme.colorScheme.onSurface,

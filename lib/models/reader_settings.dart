@@ -26,6 +26,7 @@ class ReaderSettings {
   final int wordsPerMinute;
   final ReaderFontType fontType;
   final double fontSize;
+  final double helperFontSize;
   final int wordsPerEntry;
   final bool showHelperText;
   final ThemeMode themeMode;
@@ -52,6 +53,7 @@ class ReaderSettings {
     this.wordsPerMinute = 300,
     this.fontType = ReaderFontType.system,
     this.fontSize = 32,
+    this.helperFontSize = 20,
     this.wordsPerEntry = 1,
     this.showHelperText = true,
     this.themeMode = ThemeMode.system,
@@ -81,6 +83,8 @@ class ReaderSettings {
   static const int maxWpm = 1000;
   static const double minFontSize = 16;
   static const double maxFontSize = 72;
+  static const double minHelperFontSize = 12;
+  static const double maxHelperFontSize = 48;
   static const int minWordsPerEntry = 1;
   static const int maxWordsPerEntry = 5;
 
@@ -88,6 +92,7 @@ class ReaderSettings {
     int? wordsPerMinute,
     ReaderFontType? fontType,
     double? fontSize,
+    double? helperFontSize,
     int? wordsPerEntry,
     bool? showHelperText,
     ThemeMode? themeMode,
@@ -114,6 +119,7 @@ class ReaderSettings {
       wordsPerMinute: wordsPerMinute ?? this.wordsPerMinute,
       fontType: fontType ?? this.fontType,
       fontSize: fontSize ?? this.fontSize,
+      helperFontSize: helperFontSize ?? this.helperFontSize,
       wordsPerEntry: wordsPerEntry ?? this.wordsPerEntry,
       showHelperText: showHelperText ?? this.showHelperText,
       themeMode: themeMode ?? this.themeMode,
@@ -142,6 +148,7 @@ class ReaderSettings {
         'wordsPerMinute': wordsPerMinute,
         'fontType': fontType.name,
         'fontSize': fontSize,
+        'helperFontSize': helperFontSize,
         'wordsPerEntry': wordsPerEntry,
         'showHelperText': showHelperText,
         'themeMode': themeMode.name,
@@ -184,6 +191,7 @@ class ReaderSettings {
       fontType: ReaderFontType.values.byName(
           json['fontType'] as String? ?? defaults.fontType.name),
       fontSize: (json['fontSize'] as num?)?.toDouble() ?? defaults.fontSize,
+      helperFontSize: (json['helperFontSize'] as num?)?.toDouble() ?? defaults.helperFontSize,
       wordsPerEntry: json['wordsPerEntry'] as int? ?? defaults.wordsPerEntry,
       showHelperText: json['showHelperText'] as bool? ?? defaults.showHelperText,
       themeMode: ThemeMode.values
@@ -221,6 +229,7 @@ class ReaderSettings {
       other.wordsPerMinute == wordsPerMinute &&
       other.fontType == fontType &&
       other.fontSize == fontSize &&
+      other.helperFontSize == helperFontSize &&
       other.wordsPerEntry == wordsPerEntry &&
       other.showHelperText == showHelperText &&
       other.themeMode == themeMode &&
@@ -244,10 +253,11 @@ class ReaderSettings {
       other.helperHighlightColorDark == helperHighlightColorDark;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
         wordsPerMinute,
         fontType,
         fontSize,
+        helperFontSize,
         wordsPerEntry,
         showHelperText,
         themeMode,
@@ -265,5 +275,5 @@ class ReaderSettings {
         centralLetterColorDark,
         guideLineColorDark,
         helperHighlightColorDark,
-      );
+      ]);
 }

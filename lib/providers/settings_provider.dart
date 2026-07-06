@@ -27,6 +27,7 @@ class SettingsNotifier extends Notifier<ReaderSettings> {
   void setFontType(ReaderFontType value) =>
       update(state.copyWith(fontType: value));
   void setFontSize(double value) => update(state.copyWith(fontSize: value));
+  void setHelperFontSize(double value) => update(state.copyWith(helperFontSize: value));
   void setWordsPerEntry(int value) =>
       update(state.copyWith(wordsPerEntry: value));
   void setShowHelperText(bool value) =>
