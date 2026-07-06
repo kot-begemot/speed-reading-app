@@ -96,33 +96,60 @@ Future<void> importFromLink(BuildContext context, WidgetRef ref) async {
 }
 
 Future<String?> _promptUrl(BuildContext context) {
-  final controller = TextEditingController();
   return showDialog<String>(
     context: context,
-    builder: (ctx) => AlertDialog(
+    builder: (ctx) => const _UrlInputDialog(),
+  );
+}
+
+class _UrlInputDialog extends StatefulWidget {
+  const _UrlInputDialog();
+
+  @override
+  State<_UrlInputDialog> createState() => _UrlInputDialogState();
+}
+
+class _UrlInputDialogState extends State<_UrlInputDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
       title: const Text('Read from link'),
       content: TextField(
-        controller: controller,
+        controller: _controller,
         autofocus: true,
         keyboardType: TextInputType.url,
         decoration: const InputDecoration(
           hintText: 'https://example.com/article',
           labelText: 'URL',
         ),
-        onSubmitted: (v) => Navigator.of(ctx).pop(v),
+        onSubmitted: (v) => Navigator.of(context).pop(v),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(ctx).pop(),
+          onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
         FilledButton(
-          onPressed: () => Navigator.of(ctx).pop(controller.text),
+          onPressed: () => Navigator.of(context).pop(_controller.text),
           child: const Text('Read'),
         ),
       ],
-    ),
-  ).whenComplete(controller.dispose);
+    );
+  }
 }
 
 // --- Shared ---

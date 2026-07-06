@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/book_meta.dart';
 import '../providers/books_provider.dart';
+import '../widgets/rename_dialog.dart';
 import 'reader_screen.dart';
 
 /// Book metadata + actions (spec §1, §7): open, rename, reset progress, remove.
@@ -108,28 +109,10 @@ class BookDetailsScreen extends ConsumerWidget {
 
   Future<void> _rename(
       BuildContext context, WidgetRef ref, BookMeta book) async {
-    final controller = TextEditingController(text: book.title);
     final result = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rename'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Title'),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(controller.text),
-              child: const Text('Save')),
-        ],
-      ),
+      builder: (ctx) => RenameDialog(initialValue: book.title),
     );
-    controller.dispose();
     final trimmed = result?.trim();
     if (trimmed != null && trimmed.isNotEmpty && trimmed != book.title) {
       await ref.read(booksProvider.notifier).rename(book.id, trimmed);

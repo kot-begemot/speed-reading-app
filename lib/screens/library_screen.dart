@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book_meta.dart';
 import '../providers/books_provider.dart';
 import '../widgets/book_card.dart';
+import '../widgets/rename_dialog.dart';
 import 'add_book_flow.dart';
 import 'book_details_screen.dart';
 import 'reader_screen.dart';
@@ -89,30 +90,10 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   }
 
   Future<void> _renameDialog(BookMeta book) async {
-    final controller = TextEditingController(text: book.title);
     final newTitle = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rename'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Title'),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (ctx) => RenameDialog(initialValue: book.title),
     );
-    controller.dispose();
     final trimmed = newTitle?.trim();
     if (trimmed != null && trimmed.isNotEmpty && trimmed != book.title) {
       await ref.read(booksProvider.notifier).rename(book.id, trimmed);
@@ -180,6 +161,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
         shadowColor: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
         borderRadius: BorderRadius.circular(24),
         color: scheme.surface,
+        clipBehavior: Clip.antiAlias,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
@@ -228,46 +210,51 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
               ),
             ),
             secondChild: Container(
-              width: 240,
+              width: 208,
               height: 48,
               alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _FABOption(
-                      icon: Icons.folder_open_rounded,
-                      label: 'File',
-                      onTap: () {
-                        setState(() => _isAddMenuExpanded = false);
-                        importFromFile(context, ref);
-                      },
-                      scheme: scheme,
-                    ),
-                    _FABDivider(scheme: scheme, isDark: isDark),
-                    _FABOption(
-                      icon: Icons.link_rounded,
-                      label: 'Link',
-                      onTap: () {
-                        setState(() => _isAddMenuExpanded = false);
-                        importFromLink(context, ref);
-                      },
-                      scheme: scheme,
-                    ),
-                    _FABDivider(scheme: scheme, isDark: isDark),
-                    IconButton(
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.close_rounded,
-                        size: 18,
-                        color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+              child: OverflowBox(
+                minWidth: 208,
+                maxWidth: 208,
+                minHeight: 48,
+                maxHeight: 48,
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 4),
+                  child: Row(
+                    children: [
+                      _FABOption(
+                        icon: Icons.folder_open_rounded,
+                        label: 'File',
+                        onTap: () {
+                          setState(() => _isAddMenuExpanded = false);
+                          importFromFile(context, ref);
+                        },
+                        scheme: scheme,
                       ),
-                      onPressed: () => setState(() => _isAddMenuExpanded = false),
-                    ),
-                  ],
+                      _FABDivider(scheme: scheme, isDark: isDark),
+                      _FABOption(
+                        icon: Icons.link_rounded,
+                        label: 'Link',
+                        onTap: () {
+                          setState(() => _isAddMenuExpanded = false);
+                          importFromLink(context, ref);
+                        },
+                        scheme: scheme,
+                      ),
+                      const Spacer(),
+                      _FABDivider(scheme: scheme, isDark: isDark),
+                      IconButton(
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        icon: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        ),
+                        onPressed: () => setState(() => _isAddMenuExpanded = false),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
