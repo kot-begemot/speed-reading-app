@@ -182,6 +182,51 @@ class BookImportService {
     return ImportResult(ImportStatus.success, book: meta);
   }
 
+  /// Imports raw shared text (e.g. a message or a text selection) as a book:
+  /// sanitize → tokenize → dedupe → store. No fetching; the text is the content.
+  Future<ImportResult> importText(String rawText, List<BookMeta> existing) async {
+    final text = TextParserService.sanitizeText(rawText);
+    if (text.isEmpty) return const ImportResult(ImportStatus.noText);
+
+    final totalWords = WordTokenizer.tokenize(text).wordCount;
+    if (totalWords == 0) return const ImportResult(ImportStatus.noText);
+
+    final title = _titleFromText(text);
+    final isDuplicate = existing.any((b) =>
+        b.title.toLowerCase() == title.toLowerCase() &&
+        b.totalWords == totalWords);
+    if (isDuplicate) {
+      return ImportResult(ImportStatus.duplicate, detail: title);
+    }
+
+    final now = DateTime.now();
+    final meta = BookMeta(
+      id: _uuid.v4(),
+      title: title,
+      author: 'Shared text',
+      sourceFilePath: '',
+      format: 'text',
+      totalWords: totalWords,
+      addedAt: now,
+      lastOpenedAt: now,
+    );
+    await storage.addBook(meta, text);
+    return ImportResult(ImportStatus.success, book: meta);
+  }
+
+  /// Derives a short title from the first line / few words of shared text.
+  static String _titleFromText(String text) {
+    final firstLine = text.split('\n').firstWhere(
+          (l) => l.trim().isNotEmpty,
+          orElse: () => text,
+        );
+    final words = firstLine.trim().split(RegExp(r'\s+'));
+    var title = words.take(8).join(' ').trim();
+    if (title.length > 60) title = '${title.substring(0, 57)}…';
+    if (words.length > 8 && !title.endsWith('…')) title = '$title…';
+    return title.isEmpty ? 'Shared text' : title;
+  }
+
   static String _normalizeUrl(String raw) {
     var u = raw.trim();
     // Strip wrapping angle brackets / quotes and any internal whitespace.

@@ -164,10 +164,11 @@ void _showParsing(BuildContext context) {
 
 void _finish(BuildContext context, ImportResult result) {
   if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
-  if (context.mounted) _snack(context, _messageFor(result));
+  if (context.mounted) _snack(context, importResultMessage(result));
 }
 
-String _messageFor(ImportResult r) {
+/// User-facing message for an import outcome. Shared with the share-intent flow.
+String importResultMessage(ImportResult r) {
   switch (r.status) {
     case ImportStatus.success:
       return 'Added “${r.book!.title}”';
