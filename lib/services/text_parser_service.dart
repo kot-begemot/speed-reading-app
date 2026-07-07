@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:path/path.dart' as p;
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:epubx/epubx.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -14,11 +15,13 @@ class ParsedBook {
   final String? title;
   final String? author;
   final List<int>? coverBytes;
+  final Map<String, List<int>>? images;
   const ParsedBook({
     required this.text,
     this.title,
     this.author,
     this.coverBytes,
+    this.images,
   });
 }
 
@@ -120,7 +123,25 @@ class TextParserService {
   }
 
   static String _stripHtml(String html) {
-    final cleaned = html
+    var processedHtml = html;
+    processedHtml = processedHtml.replaceAllMapped(
+      RegExp(r'''<img\s+[^>]*src=["']([^"']+)["'][^>]*>''', caseSensitive: false),
+      (match) {
+        final src = match.group(1) ?? '';
+        final filename = p.basename(src);
+        return ' [IMAGE:$filename] ';
+      },
+    );
+    processedHtml = processedHtml.replaceAllMapped(
+      RegExp(r'''<image\s+[^>]*xlink:href=["']([^"']+)["'][^>]*>''', caseSensitive: false),
+      (match) {
+        final href = match.group(1) ?? '';
+        final filename = p.basename(href);
+        return ' [IMAGE:$filename] ';
+      },
+    );
+
+    final cleaned = processedHtml
         .replaceAll(RegExp(r'<!--[\s\S]*?-->'), ' ') // comments
         .replaceAll(
           RegExp(r'<script[\s\S]*?</script>', caseSensitive: false),
@@ -204,22 +225,57 @@ class TextParserService {
           if (coverImage != null) {
             coverBytes = img.encodePng(coverImage);
           } else {
-            final images = book.Content?.Images;
-            if (images != null && images.isNotEmpty) {
-              final firstImage = images.values.first;
-              if (firstImage.Content != null && firstImage.Content!.isNotEmpty) {
-                coverBytes = firstImage.Content;
+            final epubImages = book.Content?.Images;
+            if (epubImages != null && epubImages.isNotEmpty) {
+              final coverKey = epubImages.keys.firstWhere(
+                (k) => k.toLowerCase().contains('cover') &&
+                       epubImages[k]?.Content != null &&
+                       epubImages[k]!.Content!.isNotEmpty,
+                orElse: () => '',
+              );
+              if (coverKey.isNotEmpty) {
+                coverBytes = epubImages[coverKey]!.Content;
+              } else {
+                final titleKey = epubImages.keys.firstWhere(
+                  (k) => (k.toLowerCase().contains('title') || k.toLowerCase().contains('jacket')) &&
+                         epubImages[k]?.Content != null &&
+                         epubImages[k]!.Content!.isNotEmpty,
+                  orElse: () => '',
+                );
+                if (titleKey.isNotEmpty) {
+                  coverBytes = epubImages[titleKey]!.Content;
+                } else {
+                  final firstImage = epubImages.values.firstWhere(
+                    (img) => img.Content != null && img.Content!.isNotEmpty,
+                    orElse: () => epubImages.values.first,
+                  );
+                  coverBytes = firstImage.Content;
+                }
               }
             }
           }
         } catch (_) {
           // Keep importing even if cover parsing fails.
         }
+
+        final images = <String, List<int>>{};
+        final epubImages = book.Content?.Images;
+        if (epubImages != null) {
+          for (final entry in epubImages.entries) {
+            final content = entry.value.Content;
+            if (content != null && content.isNotEmpty) {
+              final filename = p.basename(entry.key);
+              images[filename] = content;
+            }
+          }
+        }
+
         return ParsedBook(
           text: text,
           title: book.Title,
           author: book.Author,
           coverBytes: coverBytes,
+          images: images,
         );
       }
       // Parsed but empty → try the manual fallback below.
@@ -278,7 +334,19 @@ class TextParserService {
       if (text.isEmpty) {
         throw const ParseFailure('EPUB contained no extractable text');
       }
-      return ParsedBook(text: text);
+
+      final images = <String, List<int>>{};
+      for (final f in archive.files) {
+        if (f.isFile && RegExp(r'\.(png|jpg|jpeg|gif|webp|svg)$', caseSensitive: false).hasMatch(f.name)) {
+          final filename = p.basename(f.name);
+          images[filename] = f.content as List<int>;
+        }
+      }
+
+      return ParsedBook(
+        text: text,
+        images: images,
+      );
     } on ParseFailure {
       rethrow;
     } catch (e) {

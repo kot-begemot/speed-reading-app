@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../models/tokenized_text.dart';
@@ -19,6 +21,7 @@ class HelperTextView extends StatefulWidget {
   final double helperFontSize;
   final String? fontFamily;
   final double bottomPadding;
+  final String booksDirPath;
 
   const HelperTextView({
     super.key,
@@ -28,6 +31,7 @@ class HelperTextView extends StatefulWidget {
     required this.helperFontSize,
     required this.fontFamily,
     required this.bottomPadding,
+    required this.booksDirPath,
   });
 
   @override
@@ -144,6 +148,7 @@ class _HelperTextViewState extends State<HelperTextView> {
             colors: widget.colors,
             helperFontSize: widget.helperFontSize,
             fontFamily: widget.fontFamily,
+            booksDirPath: widget.booksDirPath,
           ),
         );
       },
@@ -158,6 +163,7 @@ class _HelperParagraph extends StatefulWidget {
   final ReaderColors colors;
   final double helperFontSize;
   final String? fontFamily;
+  final String booksDirPath;
 
   const _HelperParagraph({
     required this.engine,
@@ -166,6 +172,7 @@ class _HelperParagraph extends StatefulWidget {
     required this.colors,
     required this.helperFontSize,
     required this.fontFamily,
+    required this.booksDirPath,
   });
 
   @override
@@ -227,14 +234,30 @@ class _HelperParagraphState extends State<_HelperParagraph> {
       color: _onHighlight(widget.colors.helperHighlight),
     );
 
-    final spans = <TextSpan>[];
+    final spans = <InlineSpan>[];
     for (var i = 0; i < widget.span.length; i++) {
       final globalIndex = widget.span.startWordIndex + i;
+      final word = widget.text.words[globalIndex];
       final highlighted = globalIndex >= _hlStart && globalIndex < _hlEnd;
+
+      final match = RegExp(r'^\[IMAGE:(.+)\]$').firstMatch(word);
+      if (match != null) {
+        final filename = match.group(1)!;
+        spans.add(WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: _HelperImage(
+            bookId: widget.engine.bookId,
+            filename: filename,
+            booksDirPath: widget.booksDirPath,
+          ),
+        ));
+        continue;
+      }
+
       spans.add(TextSpan(
         text: i == widget.span.length - 1
-            ? widget.text.words[globalIndex]
-            : '${widget.text.words[globalIndex]} ',
+            ? word
+            : '$word ',
         style: highlighted ? highlightStyle : base,
         recognizer: _recognizers[i],
       ));
@@ -249,4 +272,117 @@ class _HelperParagraphState extends State<_HelperParagraph> {
   /// Pick readable text color on the highlight background.
   Color _onHighlight(Color bg) =>
       bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+}
+
+class _HelperImage extends StatelessWidget {
+  final String bookId;
+  final String filename;
+  final String booksDirPath;
+
+  const _HelperImage({
+    required this.bookId,
+    required this.filename,
+    required this.booksDirPath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final imagePath = p.join(booksDirPath, '${bookId}_img_$filename');
+    final file = File(imagePath);
+
+    if (!file.existsSync()) {
+      return const SizedBox.shrink();
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context, rootNavigator: true).push(
+          PageRouteBuilder(
+            opaque: false,
+            barrierColor: Colors.black.withValues(alpha: 0.9),
+            pageBuilder: (context, _, __) {
+              return FullscreenImageOverlay(imageFile: file);
+            },
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Hero(
+            tag: file.path,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 250,
+                maxWidth: 400,
+              ),
+              child: Image.file(
+                file,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FullscreenImageOverlay extends StatelessWidget {
+  final File imageFile;
+
+  const FullscreenImageOverlay({super.key, required this.imageFile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          Positioned.fill(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  color: Colors.transparent,
+                  child: Center(
+                    child: Hero(
+                      tag: imageFile.path,
+                      child: Image.file(
+                        imageFile,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            right: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black.withValues(alpha: 0.5),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.close_rounded, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
