@@ -82,6 +82,17 @@ class BookImportService {
       }
     }
 
+    if (parsed.images != null && parsed.images!.isNotEmpty) {
+      for (final entry in parsed.images!.entries) {
+        try {
+          final file = storage.imageFile(bookId, entry.key);
+          await file.writeAsBytes(entry.value);
+        } catch (_) {
+          // Ignore individual image write failure.
+        }
+      }
+    }
+
     final meta = BookMeta(
       id: bookId,
       title: title,

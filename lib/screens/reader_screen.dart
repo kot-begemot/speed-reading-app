@@ -232,6 +232,7 @@ class _ReaderBodyState extends ConsumerState<_ReaderBody> {
         helperFontSize: settings.helperFontSize,
         fontFamily: fontFamily,
         bottomPadding: menuBottomPadding,
+        booksDirPath: ref.read(storageServiceProvider).booksDirPath,
       ),
     );
 
