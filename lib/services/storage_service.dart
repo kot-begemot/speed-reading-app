@@ -5,19 +5,29 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../models/book_meta.dart';
+import '../models/trainer_profile.dart';
+import '../models/training_content.dart';
+import '../models/training_session.dart';
 
 /// Owns book persistence: a Hive box of [BookMeta] (metadata only) plus the
 /// on-disk `books/` directory that holds each book's extracted text and cover.
-///
-/// The library reads only the box (cheap). Text is read lazily via
-/// [readBookText] when the reader opens. Removing a book deletes both the Hive
-/// record and its files.
+/// Also handles the reading trainer's persistence: user profiles, sessions,
+/// and content library boxes.
 class StorageService {
-  StorageService._(this._box, this._booksDir);
+  StorageService._(
+    this._box,
+    this._trainerProfileBox,
+    this._sessionBox,
+    this._textBox,
+    this._booksDir,
+  );
 
   static const String boxName = 'books';
 
   final Box<BookMeta> _box;
+  final Box<TrainerProfile> _trainerProfileBox;
+  final Box<TrainingSession> _sessionBox;
+  final Box<TrainingText> _textBox;
   final Directory _booksDir;
 
   /// Opens the box and ensures the books directory exists.
@@ -29,13 +39,42 @@ class StorageService {
     if (!Hive.isAdapterRegistered(BookMetaAdapter().typeId)) {
       Hive.registerAdapter(BookMetaAdapter());
     }
+    if (!Hive.isAdapterRegistered(TrainerProfileAdapter().typeId)) {
+      Hive.registerAdapter(TrainerProfileAdapter());
+    }
+    if (!Hive.isAdapterRegistered(TrainerLanguageProfileAdapter().typeId)) {
+      Hive.registerAdapter(TrainerLanguageProfileAdapter());
+    }
+    if (!Hive.isAdapterRegistered(TrainingSessionAdapter().typeId)) {
+      Hive.registerAdapter(TrainingSessionAdapter());
+    }
+    if (!Hive.isAdapterRegistered(ExerciseResultAdapter().typeId)) {
+      Hive.registerAdapter(ExerciseResultAdapter());
+    }
+    if (!Hive.isAdapterRegistered(TrainingTextAdapter().typeId)) {
+      Hive.registerAdapter(TrainingTextAdapter());
+    }
+    if (!Hive.isAdapterRegistered(ComprehensionQuestionAdapter().typeId)) {
+      Hive.registerAdapter(ComprehensionQuestionAdapter());
+    }
+
     final box = await Hive.openBox<BookMeta>(boxName);
+    final trainerProfileBox = await Hive.openBox<TrainerProfile>('trainer_profiles');
+    final sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
+    final textBox = await Hive.openBox<TrainingText>('training_texts');
+
     final base = docsDir ?? await getApplicationDocumentsDirectory();
     final booksDir = Directory(p.join(base.path, 'books'));
     if (!booksDir.existsSync()) {
       booksDir.createSync(recursive: true);
     }
-    return StorageService._(box, booksDir);
+    return StorageService._(
+      box,
+      trainerProfileBox,
+      sessionBox,
+      textBox,
+      booksDir,
+    );
   }
 
   File _textFile(String id) => File(p.join(_booksDir.path, '$id.txt'));
@@ -119,5 +158,94 @@ class StorageService {
         }
       }
     } catch (_) {}
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reading Trainer CRUD
+  // ---------------------------------------------------------------------------
+
+  /// Retrieves the trainer profile, creating a default one if none exists.
+  Future<TrainerProfile> getOrCreateTrainerProfile() async {
+    const profileId = 'global_profile';
+    var profile = _trainerProfileBox.get(profileId);
+    if (profile == null) {
+      profile = TrainerProfile(
+        id: profileId,
+        defaultLanguageCode: 'en',
+        languageProfiles: {
+          'en': TrainerLanguageProfile(
+            languageCode: 'en',
+            currentLevel: 1,
+            successfulSessionsInRow: 0,
+            bestEffectiveWpm: 0,
+          ),
+          'ru': TrainerLanguageProfile(
+            languageCode: 'ru',
+            currentLevel: 1,
+            successfulSessionsInRow: 0,
+            bestEffectiveWpm: 0,
+          ),
+        },
+      );
+      await _trainerProfileBox.put(profileId, profile);
+    }
+    return profile;
+  }
+
+  /// Updates or saves the trainer profile.
+  Future<void> saveTrainerProfile(TrainerProfile profile) async {
+    await _trainerProfileBox.put(profile.id, profile);
+  }
+
+  /// Reset trainer progress by deleting the profiles and session logs.
+  Future<void> resetTrainerProgress() async {
+    await _trainerProfileBox.clear();
+    await _sessionBox.clear();
+  }
+
+  /// Saves a completed training session log.
+  Future<void> saveTrainingSession(TrainingSession session) async {
+    await _sessionBox.put(session.id, session);
+  }
+
+  /// Retrieves all training sessions sorted by date descending.
+  List<TrainingSession> getAllSessions({String? languageCode}) {
+    final list = _sessionBox.values.toList();
+    list.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+    if (languageCode != null) {
+      return list.where((s) => s.languageCode == languageCode).toList();
+    }
+    return list;
+  }
+
+  /// Retrieves the most recent training sessions up to the specified limit.
+  List<TrainingSession> getRecentSessions(int limit, {String? languageCode}) {
+    final list = getAllSessions(languageCode: languageCode);
+    if (list.length > limit) {
+      return list.sublist(0, limit);
+    }
+    return list;
+  }
+
+  /// Saves a training text.
+  Future<void> saveTrainingText(TrainingText text) async {
+    await _textBox.put(text.id, text);
+  }
+
+  /// Retrieves all training texts for a specific language.
+  List<TrainingText> getTrainingTexts(String languageCode) {
+    return _textBox.values.where((t) => t.languageCode == languageCode).toList();
+  }
+
+  /// Retrieves training texts for a specific language and difficulty level.
+  List<TrainingText> getTextsForLevel(String languageCode, int level) {
+    return _textBox.values
+        .where((t) => t.languageCode == languageCode && t.level == level)
+        .toList();
+  }
+
+  /// Clears the training texts box.
+  Future<void> clearAllTrainingTexts() async {
+    await _textBox.clear();
   }
 }

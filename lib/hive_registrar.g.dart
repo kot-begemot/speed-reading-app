@@ -4,15 +4,30 @@
 
 import 'package:hive_ce/hive_ce.dart';
 import 'package:speed_reading_app/models/book_meta.dart';
+import 'package:speed_reading_app/models/trainer_profile.dart';
+import 'package:speed_reading_app/models/training_content.dart';
+import 'package:speed_reading_app/models/training_session.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(BookMetaAdapter());
+    registerAdapter(ComprehensionQuestionAdapter());
+    registerAdapter(ExerciseResultAdapter());
+    registerAdapter(TrainerLanguageProfileAdapter());
+    registerAdapter(TrainerProfileAdapter());
+    registerAdapter(TrainingSessionAdapter());
+    registerAdapter(TrainingTextAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(BookMetaAdapter());
+    registerAdapter(ComprehensionQuestionAdapter());
+    registerAdapter(ExerciseResultAdapter());
+    registerAdapter(TrainerLanguageProfileAdapter());
+    registerAdapter(TrainerProfileAdapter());
+    registerAdapter(TrainingSessionAdapter());
+    registerAdapter(TrainingTextAdapter());
   }
 }

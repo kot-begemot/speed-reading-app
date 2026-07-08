@@ -1,0 +1,656 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'trainer_tokens.dart';
+
+class _PeripheralRound {
+  final String target;
+  final List<String> options;
+  final int angleIndex; // 0 to 7 representing angle: index * pi / 4
+
+  _PeripheralRound({
+    required this.target,
+    required this.options,
+    required this.angleIndex,
+  });
+}
+
+/// Fully interactive Peripheral Vision drill. Shows a central focal point and flashes
+/// stimuli at the periphery, requiring the user to recognize the word.
+class PeripheralVisionRuntimeScreen extends StatefulWidget {
+  final void Function(int score, int errors, int durationSecs)? onComplete;
+
+  const PeripheralVisionRuntimeScreen({
+    super.key,
+    this.onComplete,
+  });
+
+  @override
+  State<PeripheralVisionRuntimeScreen> createState() => PeripheralVisionRuntimeScreenState();
+}
+
+class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeScreen> {
+  static const int _totalRounds = 10;
+  static const double _peripheralRadiusFactor = 0.35; // R = min(w,h) * factor
+
+  // Pool of target word options
+  static final List<List<String>> _wordPool = [
+    ['cloud', 'clock', 'crowd', 'could'],
+    ['house', 'horse', 'mouse', 'whose'],
+    ['train', 'brain', 'drain', 'chain'],
+    ['light', 'night', 'right', 'fight'],
+    ['water', 'waiter', 'paper', 'later'],
+    ['green', 'greet', 'greed', 'grown'],
+    ['stone', 'store', 'shine', 'alone'],
+    ['flame', 'frame', 'shame', 'blame'],
+    ['beach', 'bench', 'reach', 'peach'],
+    ['smart', 'start', 'shirt', 'smash'],
+  ];
+
+  late List<_PeripheralRound> _rounds;
+  int _currentRoundIndex = 0;
+  int _errorCount = 0;
+  int _correctCount = 0;
+  bool _isFinished = false;
+
+  // Flash phases: 'waiting', 'flashing', 'answering', 'feedback'
+  String _flashPhase = 'waiting'; 
+  int? _selectedOptionIndex;
+  Timer? _phaseTimer;
+  Timer? _globalTimer;
+  int _elapsedSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startNewGame();
+  }
+
+  @override
+  void dispose() {
+    _phaseTimer?.cancel();
+    _globalTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startNewGame() {
+    _phaseTimer?.cancel();
+    _globalTimer?.cancel();
+
+    _currentRoundIndex = 0;
+    _errorCount = 0;
+    _correctCount = 0;
+    _elapsedSeconds = 0;
+    _isFinished = false;
+    _selectedOptionIndex = null;
+    _flashPhase = 'waiting';
+
+    _generateRounds();
+    _startGlobalTimer();
+    _startRoundSequence();
+  }
+
+  void _generateRounds() {
+    final rand = Random();
+    // Copy and shuffle word pool
+    final pool = [..._wordPool]..shuffle();
+
+    _rounds = List.generate(_totalRounds, (index) {
+      final item = pool[index % pool.length];
+      final target = item[0];
+      // Shuffle options for multiple choice
+      final options = [...item]..shuffle();
+      // Choose a random peripheral position angle index (0 to 7)
+      final angleIdx = rand.nextInt(8);
+
+      return _PeripheralRound(
+        target: target,
+        options: options,
+        angleIndex: angleIdx,
+      );
+    });
+  }
+
+  void _startGlobalTimer() {
+    _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  void _startRoundSequence() {
+    setState(() {
+      _flashPhase = 'waiting';
+      _selectedOptionIndex = null;
+    });
+
+    // 1. Wait 800ms with center dot only, then flash
+    _phaseTimer = Timer(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
+      setState(() {
+        _flashPhase = 'flashing';
+      });
+
+      // 2. Flash word for 600ms, then hide and show answers
+      _phaseTimer = Timer(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        setState(() {
+          _flashPhase = 'answering';
+        });
+      });
+    });
+  }
+
+  void _handleOptionSelect(int index) {
+    if (_flashPhase != 'answering') return;
+
+    final round = _rounds[_currentRoundIndex];
+    final isCorrect = round.options[index] == round.target;
+
+    setState(() {
+      _selectedOptionIndex = index;
+      _flashPhase = 'feedback';
+      if (isCorrect) {
+        _correctCount++;
+        HapticFeedback.lightImpact();
+      } else {
+        _errorCount++;
+        HapticFeedback.vibrate();
+      }
+    });
+
+    // 3. Wait 1200ms on feedback phase, then advance or complete
+    _phaseTimer = Timer(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+      if (_currentRoundIndex < _totalRounds - 1) {
+        setState(() {
+          _currentRoundIndex++;
+        });
+        _startRoundSequence();
+      } else {
+        _finishGame();
+      }
+    });
+  }
+
+  void _finishGame() {
+    _globalTimer?.cancel();
+    _phaseTimer?.cancel();
+    setState(() {
+      _isFinished = true;
+    });
+  }
+
+  String _formatTime(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  int _calculateAccuracy() {
+    if (_currentRoundIndex == 0 && _flashPhase == 'waiting') return 100;
+    final totalRoundsPlayed = _correctCount + _errorCount;
+    if (totalRoundsPlayed == 0) return 100;
+    return (_correctCount / totalRoundsPlayed * 100).round();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: T.surface,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                _topBar(),
+                const SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Keep your eyes on the center dot',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                ),
+                Expanded(child: _field()),
+                _bottomAnswerArea(),
+              ],
+            ),
+            if (_isFinished) _buildFinishedOverlay(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _topBar() {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: T.surfaceLow,
+                shape: BoxShape.circle,
+                border: Border.all(color: T.border, width: 0.8),
+              ),
+              child: const Icon(
+                Icons.close_rounded,
+                size: 20,
+                color: T.textSecondary,
+              ),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Peripheral Vision · 8 positions',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: T.textSecondary,
+                ),
+              ),
+              Text(
+                _isFinished ? 'Complete' : 'Round ${_currentRoundIndex + 1} / $_totalRounds',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: T.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          _circleButton(
+            icon: Icons.refresh_rounded,
+            onTap: _startNewGame,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _circleButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: T.surfaceLowest,
+          shape: BoxShape.circle,
+          border: Border.all(color: T.border, width: 0.8),
+        ),
+        child: Icon(icon, size: 20, color: T.textSecondary),
+      ),
+    );
+  }
+
+  Widget _field() {
+    final round = _rounds[_currentRoundIndex];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        final h = constraints.maxHeight;
+
+        final centerX = w / 2;
+        final centerY = h / 2;
+        final radius = min(w, h) * _peripheralRadiusFactor;
+
+        // Calculate active peripheral positions for faint dots
+        final List<Point<double>> dotPositions = [];
+        for (int i = 0; i < 8; i++) {
+          final double angle = i * pi / 4;
+          final double x = centerX + radius * cos(angle);
+          final double y = centerY + radius * sin(angle);
+          dotPositions.add(Point(x, y));
+        }
+
+        // Active stimulus coordinate
+        final activePos = dotPositions[round.angleIndex];
+
+        return Stack(
+          key: const Key('peripheral_field_stack'),
+          clipBehavior: Clip.hardEdge,
+          children: [
+            // Center crosshair (+)
+            Positioned(
+              left: centerX - 13,
+              top: centerY - 22,
+              child: const Text(
+                '+',
+                style: TextStyle(
+                  fontSize: 26,
+                  color: Color(0x304C6EF5),
+                ),
+              ),
+            ),
+            // Center focal dot
+            Positioned(
+              left: centerX - 8,
+              top: centerY - 8,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: const BoxDecoration(
+                  color: T.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            // Faint peripheral helper dots
+            for (int i = 0; i < dotPositions.length; i++)
+              Positioned(
+                left: dotPositions[i].x - 4,
+                top: dotPositions[i].y - 4,
+                child: const _FaintDot(),
+              ),
+            // Active Flash Stimulus
+            if (_flashPhase == 'flashing')
+              Positioned(
+                left: activePos.x - 45, // approximate center offset
+                top: activePos.y - 18,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: T.surfaceLowest,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: T.warning, width: 1.4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: T.warning.withValues(alpha: 0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: Text(
+                    round.target,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: T.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _bottomAnswerArea() {
+    final round = _rounds[_currentRoundIndex];
+    final showOptions = _flashPhase == 'answering' || _flashPhase == 'feedback';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            showOptions ? 'Which word appeared?' : 'Focus on the center...',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: T.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Opacity(
+            opacity: showOptions ? 1.0 : 0.2,
+            child: AbsorbPointer(
+              absorbing: !showOptions,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 4,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 2.8,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemBuilder: (context, index) {
+                  final option = round.options[index];
+                  final isSelected = _selectedOptionIndex == index;
+                  final isCorrectOption = option == round.target;
+                  final showFeedback = _flashPhase == 'feedback';
+
+                  Color cardBg = T.surfaceLowest;
+                  Color borderCol = T.border;
+                  Color textCol = T.textPrimary;
+                  double borderWidth = 0.8;
+
+                  if (showFeedback) {
+                    if (isCorrectOption) {
+                      cardBg = T.successBg;
+                      borderCol = T.success;
+                      textCol = T.success;
+                      borderWidth = 1.4;
+                    } else if (isSelected) {
+                      cardBg = T.dangerBg;
+                      borderCol = T.error;
+                      textCol = T.error;
+                      borderWidth = 1.4;
+                    }
+                  } else if (isSelected) {
+                    cardBg = T.primaryBg;
+                    borderCol = T.primary;
+                    textCol = T.primary;
+                    borderWidth = 1.4;
+                  }
+
+                  return GestureDetector(
+                    onTap: () => _handleOptionSelect(index),
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: borderCol, width: borderWidth),
+                      ),
+                      child: Text(
+                        option,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: (isSelected || (showFeedback && isCorrectOption))
+                              ? FontWeight.w800
+                              : FontWeight.w500,
+                          color: textCol,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinishedOverlay() {
+    final acc = _calculateAccuracy();
+
+    return Positioned.fill(
+      child: Container(
+        color: T.surface.withValues(alpha: 0.98),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 68,
+                  height: 68,
+                  decoration: const BoxDecoration(
+                    color: T.successBg,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_rounded,
+                    size: 36,
+                    color: T.success,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Exercise Complete!',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: T.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'You finished Peripheral Vision successfully.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                ),
+                const SizedBox(height: 24),
+                // Stats Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: T.card(radius: 16),
+                  child: Column(
+                    children: [
+                      _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
+                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      _statRow('Accuracy', '$acc%'),
+                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      _statRow('Errors committed', '$_errorCount'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    if (widget.onComplete == null) ...[
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _startNewGame,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: const BorderSide(color: T.border),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Text(
+                            'Try Again',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: T.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (widget.onComplete != null) {
+                            widget.onComplete!(acc, _errorCount, _elapsedSeconds);
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: T.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _statRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: T.textSecondary,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: T.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FaintDot extends StatelessWidget {
+  const _FaintDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: T.textSecondary.withValues(alpha: 0.15),
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}

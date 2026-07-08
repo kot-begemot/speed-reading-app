@@ -4,9 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/book_meta.dart';
 import '../utils/word_tokenizer.dart';
 import 'storage_service.dart';
+import 'trainer_seed_data.dart';
 
 /// Seeds a couple of bundled sample books on first run so the library isn't
 /// empty before the import flow (Stage 3) exists.
+/// Also seeds the trainer's baseline diagnostic texts.
 ///
 /// Idempotent: guarded by a `shared_preferences` flag AND a per-book existence
 /// check, so cold-restarting never duplicates seed books.
@@ -29,6 +31,14 @@ class SeedService {
   ];
 
   static Future<void> ensureSeeded(StorageService storage) async {
+    // Seed diagnostic texts if they are empty
+    if (storage.getTrainingTexts('en').isEmpty && storage.getTrainingTexts('ru').isEmpty) {
+      final diagTexts = TrainerSeedData.getDiagnosticTexts();
+      for (final text in diagTexts) {
+        await storage.saveTrainingText(text);
+      }
+    }
+
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(_seededFlag) == true) return;
 
