@@ -11,6 +11,9 @@ class MainNavigationShell extends StatefulWidget {
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
 }
+//TODO
+//Add smooth transitions, work out a better transition and screen swap effect. 
+//Make it look more sleek and custom to the app.
 
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
