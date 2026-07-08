@@ -5,8 +5,8 @@ import '../../screens/trainer/trainer_tokens.dart';
 /// Status shown on the top-right chip of an [ExerciseCard].
 enum ExerciseStatus { recommended, available, completed, locked }
 
-/// Static exercise card mock: icon, title, purpose, best/last results,
-/// a status chip and a Start action. UI only.
+/// Exercise card: icon, title, purpose, best/last results, a status chip
+/// and a Start action that invokes [onStart] when tapped.
 class ExerciseCard extends StatelessWidget {
   final IconData icon;
   final Color accent;
@@ -15,6 +15,8 @@ class ExerciseCard extends StatelessWidget {
   final String best;
   final String last;
   final ExerciseStatus status;
+  final VoidCallback? onStart;
+  final bool highlighted;
 
   const ExerciseCard({
     super.key,
@@ -25,6 +27,8 @@ class ExerciseCard extends StatelessWidget {
     this.best = '—',
     this.last = '—',
     this.status = ExerciseStatus.available,
+    this.onStart,
+    this.highlighted = false,
   });
 
   (String, Color, Color) get _chip => switch (status) {
@@ -39,79 +43,89 @@ class ExerciseCard extends StatelessWidget {
     final (chipText, chipColor, chipBg) = _chip;
     return Opacity(
       opacity: status == ExerciseStatus.locked ? 0.55 : 1,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: T.card(),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onStart,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: highlighted
+                ? T.card().copyWith(border: Border.all(color: accent, width: 1.6))
+                : T.card(),
+            child: Column(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, size: 24, color: accent),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(icon, size: 24, color: accent),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(title,
-                                style: const TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w700, color: T.textPrimary)),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(title,
+                                    style: const TextStyle(
+                                        fontSize: 15, fontWeight: FontWeight.w700, color: T.textPrimary)),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration:
+                                    BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(8)),
+                                child: Text(chipText,
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.3,
+                                        color: chipColor)),
+                              ),
+                            ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(8)),
-                            child: Text(chipText,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.3,
-                                    color: chipColor)),
-                          ),
+                          const SizedBox(height: 3),
+                          Text(purpose,
+                              style: const TextStyle(fontSize: 12, height: 1.3, color: T.textSecondary)),
                         ],
                       ),
-                      const SizedBox(height: 3),
-                      Text(purpose,
-                          style: const TextStyle(fontSize: 12, height: 1.3, color: T.textSecondary)),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    _stat('BEST', best),
+                    const SizedBox(width: 14),
+                    _stat('LAST', last),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(color: T.primary, borderRadius: BorderRadius.circular(20)),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Start',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: T.onPrimary)),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_rounded, size: 16, color: T.onPrimary),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _stat('BEST', best),
-                const SizedBox(width: 14),
-                _stat('LAST', last),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(color: T.primary, borderRadius: BorderRadius.circular(20)),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Start',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: T.onPrimary)),
-                      SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_rounded, size: 16, color: T.onPrimary),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

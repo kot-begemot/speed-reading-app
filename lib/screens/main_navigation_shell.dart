@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../widgets/trainer/trainer_bottom_nav.dart';
 import 'library_screen.dart';
-import 'placeholder_screens.dart';
 import 'settings_screen.dart';
+import 'trainer/progress_dashboard_screen.dart';
+import 'trainer/trainer_home_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
@@ -20,8 +21,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   final List<Widget> _screens = const [
     LibraryScreen(),
-    TrainerPlaceholderScreen(),
-    ProgressPlaceholderScreen(),
+    TrainerHomeScreen(),
+    ProgressDashboardScreen(),
     SettingsScreen(),
   ];
 

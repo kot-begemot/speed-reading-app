@@ -1,13 +1,99 @@
 import 'package:flutter/material.dart';
 
 import 'trainer_tokens.dart';
+import '../../models/training_content.dart';
 
-/// Static mock: Comprehension Test (quiz) screen.
-class ComprehensionTestScreen extends StatelessWidget {
-  const ComprehensionTestScreen({super.key});
+/// Fully interactive Comprehension Test (quiz) screen with question navigation,
+/// option selection, answer mapping, and completion callback.
+class ComprehensionTestScreen extends StatefulWidget {
+  final List<ComprehensionQuestion> questions;
+  final void Function(int correctCount)? onComplete;
+
+  const ComprehensionTestScreen({
+    super.key,
+    required this.questions,
+    this.onComplete,
+  });
+
+  @override
+  State<ComprehensionTestScreen> createState() => _ComprehensionTestScreenState();
+}
+
+class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
+  int _currentQuestionIndex = 0;
+  
+  // Maps question index to the selected option index (0 to 3)
+  final Map<int, int> _selectedOptions = {};
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _selectOption(int index) {
+    setState(() {
+      _selectedOptions[_currentQuestionIndex] = index;
+    });
+  }
+
+  void _goBack() {
+    if (_currentQuestionIndex > 0) {
+      setState(() {
+        _currentQuestionIndex--;
+      });
+    }
+  }
+
+  void _goNextOrSubmit() {
+    if (_selectedOptions[_currentQuestionIndex] == null) {
+      // Show snackbar if no option is selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an option before moving forward.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    if (_currentQuestionIndex < widget.questions.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+    } else {
+      _submitQuiz();
+    }
+  }
+
+  void _submitQuiz() {
+    int correctCount = 0;
+    for (int i = 0; i < widget.questions.length; i++) {
+      final selected = _selectedOptions[i];
+      final correct = widget.questions[i].correctOptionIndex;
+      if (selected == correct) {
+        correctCount++;
+      }
+    }
+
+    if (widget.onComplete != null) {
+      widget.onComplete!(correctCount);
+    } else {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.questions.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('No questions available.')),
+      );
+    }
+
+    final question = widget.questions[_currentQuestionIndex];
+    final progressFraction = (_currentQuestionIndex + 1) / widget.questions.length;
+    final isLastQuestion = _currentQuestionIndex == widget.questions.length - 1;
+
     return Scaffold(
       backgroundColor: T.surface,
       body: SafeArea(
@@ -23,7 +109,9 @@ class ComprehensionTestScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                       padding: EdgeInsets.zero,
                       icon: const Icon(
                         Icons.close_rounded,
@@ -34,26 +122,25 @@ class ComprehensionTestScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Row(
-                      children: const [
-                        _Segment(active: true),
-                        SizedBox(width: 6),
-                        _Segment(active: true),
-                        SizedBox(width: 6),
-                        _Segment(active: false),
-                        SizedBox(width: 6),
-                        _Segment(active: false),
-                        SizedBox(width: 6),
-                        _Segment(active: false),
-                      ],
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: Container(
+                        height: 6,
+                        color: T.borderStrong.withValues(alpha: 0.5),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: progressFraction.clamp(0.0, 1.0),
+                          child: Container(color: T.primary),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    '2/5',
-                    style: TextStyle(
+                  Text(
+                    '${_currentQuestionIndex + 1} / ${widget.questions.length}',
+                    style: const TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: T.textSecondary,
                     ),
                   ),
@@ -63,7 +150,7 @@ class ComprehensionTestScreen extends StatelessWidget {
             // Body.
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -76,6 +163,7 @@ class ComprehensionTestScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: T.surfaceLow,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: T.border, width: 0.8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -94,113 +182,107 @@ class ComprehensionTestScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'QUESTION 2',
-                      style: TextStyle(
+                    Text(
+                      'QUESTION ${_currentQuestionIndex + 1}',
+                      style: const TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
                         color: T.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Why did the travellers decide to cross the valley before nightfall?',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        height: 1.35,
+                    Text(
+                      question.prompt,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        height: 1.45,
                         color: T.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Column(
-                      children: const [
-                        _AnswerOption(
-                          letter: 'A',
-                          text: 'To avoid the coming storm',
-                          selected: true,
-                        ),
-                        SizedBox(height: 10),
-                        _AnswerOption(
-                          letter: 'B',
-                          text: 'To reach the river by morning',
-                          selected: false,
-                        ),
-                        SizedBox(height: 10),
-                        _AnswerOption(
-                          letter: 'C',
-                          text: 'Because the guide was waiting',
-                          selected: false,
-                        ),
-                        SizedBox(height: 10),
-                        _AnswerOption(
-                          letter: 'D',
-                          text: 'To save the remaining supplies',
-                          selected: false,
-                        ),
-                      ],
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: question.options.length,
+                        itemBuilder: (context, index) {
+                          final optionText = question.options[index];
+                          final isSelected = _selectedOptions[_currentQuestionIndex] == index;
+                          final letter = String.fromCharCode(65 + index); // A, B, C, D
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _AnswerOption(
+                              letter: letter,
+                              text: optionText,
+                              selected: isSelected,
+                              onTap: () => _selectOption(index),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    const Spacer(),
                     // Nav buttons.
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 28),
+                      padding: const EdgeInsets.only(bottom: 12, top: 12),
                       child: Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              width: 120,
-                              height: 52,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: T.borderStrong,
-                                  width: 1,
+                          if (_currentQuestionIndex > 0) ...[
+                            Expanded(
+                              flex: 1,
+                              child: OutlinedButton(
+                                onPressed: _goBack,
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  side: const BorderSide(color: T.border),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Back',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: T.textSecondary,
+                                child: const Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: T.textSecondary,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
+                            const SizedBox(width: 12),
+                          ],
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                height: 52,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: T.primary,
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: _goNextOrSubmit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: T.primary,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'Next',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: T.onPrimary,
-                                      ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    isLastQuestion ? 'Submit Test' : 'Next Question',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
                                     ),
-                                    SizedBox(width: 8),
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      size: 20,
-                                      color: T.onPrimary,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    isLastQuestion
+                                        ? Icons.check_rounded
+                                        : Icons.arrow_forward_rounded,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -218,41 +300,25 @@ class ComprehensionTestScreen extends StatelessWidget {
   }
 }
 
-class _Segment extends StatelessWidget {
-  const _Segment({required this.active});
-
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        height: 6,
-        decoration: BoxDecoration(
-          color: active ? T.primary : T.borderStrong,
-          borderRadius: BorderRadius.circular(3),
-        ),
-      ),
-    );
-  }
-}
-
 class _AnswerOption extends StatelessWidget {
   const _AnswerOption({
     required this.letter,
     required this.text,
     required this.selected,
+    required this.onTap,
   });
 
   final String letter;
   final String text;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
-      child: Container(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
@@ -262,6 +328,15 @@ class _AnswerOption extends StatelessWidget {
             color: selected ? T.primary : T.border,
             width: selected ? 1.4 : 0.8,
           ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: T.primary.withValues(alpha: 0.1),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  )
+                ]
+              : null,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -282,8 +357,8 @@ class _AnswerOption extends StatelessWidget {
                 letter,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? T.onPrimary : T.textSecondary,
+                  fontWeight: FontWeight.w800,
+                  color: selected ? Colors.white : T.textSecondary,
                 ),
               ),
             ),
@@ -293,7 +368,7 @@ class _AnswerOption extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: 15,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: T.textPrimary,
                 ),
               ),

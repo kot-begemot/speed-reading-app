@@ -24,7 +24,7 @@ class TrainerGalleryScreen extends StatelessWidget {
   static const _sections = <(String, List<(String, IconData, Color)>)>[
     ('Overview', [
       ('Trainer Home', Icons.home_rounded, T.primary),
-      ('Baseline Assessment', Icons.conversion_path, T.accentViolet),
+      ('Baseline Assessment', Icons.route_rounded, T.accentViolet),
       ('Skill Training', Icons.fitness_center_rounded, T.accentTeal),
       ('Training Program Plan', Icons.route_rounded, T.primary),
       ('Exercise Intro', Icons.tune_rounded, T.accentViolet),
@@ -51,14 +51,30 @@ class TrainerGalleryScreen extends StatelessWidget {
         'Training Program Plan' => const TrainingProgramPlanScreen(),
         'Exercise Intro' => const ExerciseIntroScreen(),
         'Schulte Table' => const SchulteRuntimeScreen(),
-        'RSVP Reading' => const RsvpRuntimeScreen(),
+        'RSVP Reading' => const RsvpRuntimeScreen(
+            textTitle: 'Sample Text',
+            textContent: 'This is a sample speed reading passage for testing the RSVP reader in gallery mode.',
+            targetWpm: 300,
+          ),
         'Number Tracking' => const NumberTrackingRuntimeScreen(),
         'Flash Recognition' => const FlashRecognitionRuntimeScreen(),
         'Peripheral Vision' => const PeripheralVisionRuntimeScreen(),
-        'Comprehension Test' => const ComprehensionTestScreen(),
-        'Session Result' => const SessionResultScreen(),
+        'Comprehension Test' => const ComprehensionTestScreen(questions: []),
+        'Session Result' => SessionResultScreen(
+            language: 'en',
+            level: 3,
+            targetWpm: 300,
+            rawWpm: 310,
+            comprehensionRate: 80,
+            consecutiveSuccessfulSessions: 2,
+            sessionsRequiredForPromotion: 3,
+            levelUpUnlocked: false,
+            onContinue: () {},
+            onRepeat: () {},
+            onGoToProgress: () {},
+          ),
         'Progress Dashboard' => const ProgressDashboardScreen(),
-        'Session History' => const SessionHistoryScreen(),
+        'Session History' => const SessionHistoryScreen(lang: 'en'),
         _ => const TrainerHomeScreen(),
       };
 

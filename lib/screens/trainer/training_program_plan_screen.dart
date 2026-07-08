@@ -1,13 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'trainer_tokens.dart';
+import '../../providers/training_program_provider.dart';
+import 'schulte_runtime_screen.dart';
+import 'flash_recognition_runtime_screen.dart';
+import 'rsvp_runtime_screen.dart';
+import 'comprehension_test_screen.dart';
+import 'session_result_screen.dart';
 
-/// Static mock: the Training Program plan screen. UI only — no logic.
-class TrainingProgramPlanScreen extends StatelessWidget {
+/// Interactive Training Program plan screen that drives the step-by-step
+/// workflow from Warm-up to Reading, Comprehension Quiz, and Results.
+class TrainingProgramPlanScreen extends ConsumerWidget {
   const TrainingProgramPlanScreen({super.key});
 
+  void _startNextStep(BuildContext context, WidgetRef ref, TrainingProgramState state) {
+    if (state.currentStepIndex == 0) {
+      // Step 1: Schulte Table Warm-up
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SchulteRuntimeScreen(
+            onComplete: (accuracy, errors, durationSecs) {
+              ref.read(trainingProgramProvider.notifier).logWarmUp(errors, durationSecs);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      );
+    } else if (state.currentStepIndex == 1) {
+      // Step 2: Flash Recognition Drill
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FlashRecognitionRuntimeScreen(
+            onComplete: (accuracy, errors, durationSecs) {
+              ref.read(trainingProgramProvider.notifier).logRecognition(accuracy, errors);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      );
+    } else if (state.currentStepIndex == 2) {
+      // Step 3: RSVP Text Reading
+      if (state.selectedText == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No unread text found for training.')),
+        );
+        return;
+      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RsvpRuntimeScreen(
+            textTitle: state.selectedText!.title,
+            textContent: state.selectedText!.body,
+            targetWpm: state.targetWpm,
+            onComplete: (rawWpm, wordsRead) {
+              ref.read(trainingProgramProvider.notifier).logReading(rawWpm, wordsRead);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      );
+    } else if (state.currentStepIndex == 3) {
+      // Step 4: Comprehension Test Quiz
+      if (state.selectedText == null) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ComprehensionTestScreen(
+            questions: state.selectedText!.questions,
+            onComplete: (correctCount) async {
+              final oldState = ref.read(trainingProgramProvider);
+              await ref.read(trainingProgramProvider.notifier).submitQuizAndCompleteSession(correctCount);
+              final newState = ref.read(trainingProgramProvider);
+              
+              if (!context.mounted) return;
+              Navigator.pop(context); // Pop comprehension test
+
+              // Push the final results screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SessionResultScreen(
+                    language: newState.languageCode,
+                    level: oldState.level,
+                    targetWpm: oldState.targetWpm,
+                    rawWpm: newState.readingWpm ?? oldState.targetWpm,
+                    comprehensionRate: newState.comprehensionRate ?? 0,
+                    consecutiveSuccessfulSessions: newState.consecutiveSuccessfulSessions,
+                    sessionsRequiredForPromotion: newState.sessionsRequiredForPromotion,
+                    levelUpUnlocked: newState.levelUpUnlocked,
+                    onContinue: () {
+                      ref.read(trainingProgramProvider.notifier).startSession();
+                      Navigator.pop(context); // pop result
+                      Navigator.pop(context); // pop plan screen (return to Trainer Home)
+                    },
+                    onRepeat: () {
+                      Navigator.pop(context); // pop result
+                      ref.read(trainingProgramProvider.notifier).startSession();
+                    },
+                    onGoToProgress: () {
+                      ref.read(trainingProgramProvider.notifier).startSession();
+                      Navigator.pop(context); // pop result
+                      Navigator.pop(context); // pop plan screen
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(trainingProgramProvider);
+
     return Scaffold(
       backgroundColor: T.surface,
       appBar: AppBar(
@@ -17,7 +129,9 @@ class TrainingProgramPlanScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Training Program',
@@ -33,8 +147,8 @@ class TrainingProgramPlanScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _goalCard(),
-            const SizedBox(height: 16),
+            _goalCard(state),
+            const SizedBox(height: 20),
             const Text(
               'This session',
               style: TextStyle(
@@ -43,82 +157,94 @@ class TrainingProgramPlanScreen extends StatelessWidget {
                 color: T.textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Column(
-              children: const [
+              children: [
                 _Step(
-                  state: _StepState.done,
-                  icon: Icons.check,
+                  state: _getStepState(0, state),
+                  icon: Icons.grid_view_rounded,
                   kicker: 'SKILL WARM-UP',
                   title: 'Schulte Table · 5×5',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _Step(
-                  state: _StepState.done,
-                  icon: Icons.check,
+                  state: _getStepState(1, state),
+                  icon: Icons.bolt_rounded,
                   kicker: 'RECOGNITION DRILL',
                   title: 'Flash Recognition · 300ms',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _Step(
-                  state: _StepState.current,
-                  icon: Icons.menu_book,
+                  state: _getStepState(2, state),
+                  icon: Icons.menu_book_rounded,
                   kicker: 'TEXT EXERCISE',
-                  title: 'RSVP Reading · 300 WPM',
+                  title: 'RSVP Reading · ${state.targetWpm} WPM',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _Step(
-                  state: _StepState.locked,
-                  icon: Icons.quiz,
+                  state: _getStepState(3, state),
+                  icon: Icons.quiz_rounded,
                   kicker: 'COMPREHENSION TEST',
-                  title: '5 questions',
+                  title: '${state.selectedText?.questions.length ?? 5} questions',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _Step(
-                  state: _StepState.locked,
-                  icon: Icons.flag,
+                  state: _getStepState(4, state),
+                  icon: Icons.flag_rounded,
                   kicker: 'LEVEL CHECKPOINT',
                   title: 'Qualify to advance',
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _primaryCta(),
-            const SizedBox(height: 16),
-            _secondaryButton(),
+            const SizedBox(height: 24),
+            if (!state.isSessionComplete) ...[
+              _primaryCta(context, ref, state),
+              const SizedBox(height: 16),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _goalCard() {
+  _StepState _getStepState(int index, TrainingProgramState state) {
+    if (state.isSessionComplete) return _StepState.done;
+    if (state.currentStepIndex > index) return _StepState.done;
+    if (state.currentStepIndex == index) return _StepState.current;
+    return _StepState.locked;
+  }
+
+  Widget _goalCard(TrainingProgramState state) {
+    final progress = state.consecutiveSuccessfulSessions;
+    final total = state.sessionsRequiredForPromotion;
+    final minComprehension = state.level <= 2 ? 70 : (state.level <= 4 ? 65 : 60);
+
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(),
+      decoration: T.card(radius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ENGLISH · LEVEL 3',
-                    style: TextStyle(
+                    '${state.languageCode.toUpperCase()} · LEVEL ${state.level}',
+                    style: const TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
                       color: T.primary,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
-                    'Goal: 300 WPM · ≥65%',
-                    style: TextStyle(
+                    'Goal: ${state.targetWpm} WPM · ≥$minComprehension%',
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: T.textPrimary,
@@ -127,9 +253,9 @@ class TrainingProgramPlanScreen extends StatelessWidget {
                 ],
               ),
               Text(
-                '2 / 3',
-                style: TextStyle(
-                  fontSize: 13,
+                '$progress / $total',
+                style: const TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: T.success,
                 ),
@@ -138,102 +264,56 @@ class TrainingProgramPlanScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Row(
-            children: [
-              _barSeg(T.success),
-              const SizedBox(width: 6),
-              _barSeg(T.success),
-              const SizedBox(width: 6),
-              _barSeg(T.borderStrong),
-            ],
+            children: List.generate(total, (index) {
+              final isFilled = index < progress;
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: index == total - 1 ? 0.0 : 6.0),
+                  child: Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: isFilled ? T.success : T.borderStrong.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
           const SizedBox(height: 12),
-          const Text(
-            '1 more qualified session to reach Level 4',
-            style: TextStyle(fontSize: 12, color: T.textSecondary),
+          Text(
+            '${total - progress} more qualified session${(total - progress) > 1 ? 's' : ''} to reach Level ${state.level + 1}',
+            style: const TextStyle(fontSize: 12, color: T.textSecondary, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 
-  Widget _barSeg(Color color) => Expanded(
-        child: Container(
-          height: 6,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-      );
+  Widget _primaryCta(BuildContext context, WidgetRef ref, TrainingProgramState state) {
+    final isQuiz = state.currentStepIndex == 3;
 
-  Widget _primaryCta() {
-    return SizedBox(
-      height: 52,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: T.primary,
+    return ElevatedButton(
+      onPressed: () => _startNextStep(context, ref, state),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: T.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        minimumSize: const Size.fromHeight(52),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(14),
-            child: const Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Start next step',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: T.onPrimary,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(Icons.play_arrow_rounded, size: 20, color: T.onPrimary),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
-    );
-  }
-
-  Widget _secondaryButton() {
-    return SizedBox(
-      height: 48,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: T.borderStrong, width: 1),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(14),
-            child: const Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.fitness_center, size: 18, color: T.primary),
-                  SizedBox(width: 8),
-                  Text(
-                    'Practice weak skill',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: T.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            isQuiz ? 'Start Comprehension Test' : 'Start next step',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
-        ),
+          const SizedBox(width: 8),
+          const Icon(Icons.play_arrow_rounded, size: 20),
+        ],
       ),
     );
   }
@@ -262,7 +342,7 @@ class _Step extends StatelessWidget {
       _StepState.locked => T.surfaceLow,
     };
     final Color iconColor =
-        state == _StepState.locked ? T.textSecondary : T.onPrimary;
+        state == _StepState.locked ? T.textSecondary : Colors.white;
     final Color kickerColor = switch (state) {
       _StepState.current => T.primary,
       _StepState.locked => T.textSecondary,
@@ -302,7 +382,7 @@ class _Step extends StatelessWidget {
                   kicker,
                   style: TextStyle(
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                     color: kickerColor,
                   ),
@@ -321,7 +401,7 @@ class _Step extends StatelessWidget {
           ),
           if (state == _StepState.done) ...[
             const SizedBox(width: 12),
-            const Icon(Icons.check_circle, size: 20, color: T.success),
+            const Icon(Icons.check_circle_rounded, size: 20, color: T.success),
           ] else if (state == _StepState.current) ...[
             const SizedBox(width: 12),
             Container(
@@ -334,8 +414,8 @@ class _Step extends StatelessWidget {
                 'NEXT',
                 style: TextStyle(
                   fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: T.onPrimary,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
               ),
             ),
