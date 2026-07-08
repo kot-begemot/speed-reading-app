@@ -62,6 +62,13 @@ class BooksNotifier extends Notifier<List<BookMeta>> {
     if (result.status == ImportStatus.success) _refresh();
     return result;
   }
+
+  /// Imports raw shared text as a book. Refreshes state only on success.
+  Future<ImportResult> importFromText(String text) async {
+    final result = await BookImportService(_storage).importText(text, state);
+    if (result.status == ImportStatus.success) _refresh();
+    return result;
+  }
 }
 
 final booksProvider =
