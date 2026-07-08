@@ -3526,7 +3526,7 @@
       "children": [
         {
           "type": "rectangle",
-          "id": "xzFiz",
+          "id": "tm0cq",
           "x": 0,
           "y": 0,
           "name": "Scrim",
@@ -3536,7 +3536,7 @@
         },
         {
           "type": "frame",
-          "id": "wVnNr",
+          "id": "hXbrg",
           "layoutPosition": "absolute",
           "x": 0,
           "y": 620,
@@ -3557,27 +3557,17 @@
             20,
             0
           ],
-          "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "mfRNV",
-              "name": "Handle",
-              "width": 32,
-              "height": 4,
-              "fill": "$border-strong",
-              "cornerRadius": 2
-            },
-            {
-              "type": "frame",
-              "id": "mRFf3",
+              "id": "KP6cD",
               "name": "HGap",
               "width": "fill_container",
               "height": 8
             },
             {
               "type": "frame",
-              "id": "rkhe8",
+              "id": "X6jGH6",
               "name": "Import a file",
               "width": "fill_container",
               "gap": 16,
@@ -3589,7 +3579,7 @@
               "children": [
                 {
                   "type": "icon",
-                  "id": "G2kmf",
+                  "id": "FjLkI",
                   "name": "Icon",
                   "width": 24,
                   "height": 24,
@@ -3599,7 +3589,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "h6sxh",
+                  "id": "DmVtv",
                   "name": "Col",
                   "width": "fill_container",
                   "layout": "vertical",
@@ -3607,7 +3597,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "id": "R5gPc",
+                      "id": "BxKll",
                       "name": "T",
                       "fill": "$text-primary",
                       "textGrowth": "fixed-width",
@@ -3619,7 +3609,7 @@
                     },
                     {
                       "type": "text",
-                      "id": "mu6V8",
+                      "id": "UnRT9",
                       "name": "S",
                       "fill": "$text-secondary",
                       "textGrowth": "fixed-width",
@@ -3635,7 +3625,7 @@
             },
             {
               "type": "frame",
-              "id": "AkNUj",
+              "id": "T2SuKJ",
               "name": "Paste a link",
               "width": "fill_container",
               "gap": 16,
@@ -3647,7 +3637,7 @@
               "children": [
                 {
                   "type": "icon",
-                  "id": "Kx2gA",
+                  "id": "DmBDg",
                   "name": "Icon",
                   "width": 24,
                   "height": 24,
@@ -3657,7 +3647,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "Hq9Y6",
+                  "id": "BHk75",
                   "name": "Col",
                   "width": "fill_container",
                   "layout": "vertical",
@@ -3665,7 +3655,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "id": "hdLjx",
+                      "id": "Yyr6r",
                       "name": "T",
                       "fill": "$text-primary",
                       "textGrowth": "fixed-width",
@@ -3677,7 +3667,7 @@
                     },
                     {
                       "type": "text",
-                      "id": "aYMgA",
+                      "id": "KZzJs",
                       "name": "S",
                       "fill": "$text-secondary",
                       "textGrowth": "fixed-width",
@@ -10612,7 +10602,8 @@
               "fill": "#4C6EF54D",
               "content": "+",
               "fontFamily": "$font-body",
-              "fontSize": 26
+              "fontSize": 26,
+              "fontWeight": "normal"
             },
             {
               "type": "ellipse",

@@ -10,7 +10,6 @@ import '../widgets/rename_dialog.dart';
 import 'add_book_flow.dart';
 import 'book_details_screen.dart';
 import 'reader_screen.dart';
-import 'settings_screen.dart';
 
 class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
@@ -146,15 +145,6 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
             letterSpacing: -0.5,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
-          ),
-        ],
       ),
       floatingActionButton: Material(
         elevation: 4,
