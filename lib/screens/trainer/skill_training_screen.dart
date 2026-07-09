@@ -8,6 +8,10 @@ import 'flash_recognition_runtime_screen.dart';
 import 'number_tracking_runtime_screen.dart';
 import 'peripheral_vision_runtime_screen.dart';
 import 'schulte_runtime_screen.dart';
+import 'chunk_reading_runtime_screen.dart';
+import 'schulte_gorbov_runtime_screen.dart';
+import 'pyramid_expansion_runtime_screen.dart';
+import 'word_match_runtime_screen.dart';
 import 'trainer_tokens.dart';
 import 'training_program_plan_screen.dart';
 
@@ -40,6 +44,13 @@ const _drills = <_DrillDef>[
     purpose: 'Peripheral vision & visual search',
   ),
   _DrillDef(
+    type: 'schulte_gorbov',
+    icon: Icons.grid_on,
+    accent: T.accentViolet,
+    title: 'Schulte-Gorbov Table',
+    purpose: 'Alternating red & black search',
+  ),
+  _DrillDef(
     type: 'number_tracking',
     icon: Icons.location_on,
     accent: T.accentTeal,
@@ -66,7 +77,20 @@ const _drills = <_DrillDef>[
     accent: T.textSecondary,
     title: 'Chunk Reading',
     purpose: 'Read in 2–4 word groups',
-    hasRuntime: false,
+  ),
+  _DrillDef(
+    type: 'pyramid_expansion',
+    icon: Icons.text_fields_rounded,
+    accent: T.accentTeal,
+    title: 'Pyramid Expansion',
+    purpose: 'Vertical focus & visual expansion',
+  ),
+  _DrillDef(
+    type: 'word_match',
+    icon: Icons.find_in_page_rounded,
+    accent: T.warning,
+    title: 'Visual Word Match',
+    purpose: 'Rapid word shape recognition',
   ),
 ];
 
@@ -122,9 +146,13 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
 
     final Widget screen = switch (drill.type) {
       'schulte' => SchulteRuntimeScreen(onComplete: onComplete),
+      'schulte_gorbov' => SchulteGorbovRuntimeScreen(onComplete: onComplete),
       'number_tracking' => NumberTrackingRuntimeScreen(onComplete: onComplete),
       'peripheral_vision' => PeripheralVisionRuntimeScreen(onComplete: onComplete),
       'flash_recognition' => FlashRecognitionRuntimeScreen(onComplete: onComplete),
+      'chunk_reading' => ChunkReadingRuntimeScreen(onComplete: onComplete),
+      'pyramid_expansion' => PyramidExpansionRuntimeScreen(onComplete: onComplete),
+      'word_match' => WordMatchRuntimeScreen(onComplete: onComplete),
       _ => const SizedBox.shrink(),
     };
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
