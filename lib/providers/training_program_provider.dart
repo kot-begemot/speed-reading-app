@@ -127,28 +127,58 @@ class TrainingProgramNotifier extends Notifier<TrainingProgramState> {
     final targetWpm = _targetWpmForLevel(level);
 
     final allTexts = storage.getTrainingTexts(activeLang);
-    final allSessions = storage.getAllSessions(languageCode: activeLang);
-    final readTextIds = allSessions.map((s) => s.textId).whereType<String>().toSet();
 
     TrainingText? selectedText;
-    final unread = allTexts.where((t) => !readTextIds.contains(t.id)).toList();
-    if (unread.isNotEmpty) {
-      selectedText = unread.first;
-    } else if (allTexts.isNotEmpty) {
-      selectedText = allTexts.first;
+    final activeTextId = langProfile?.activeSelectedTextId;
+    if (activeTextId != null) {
+      final matchingText = allTexts.where((t) => t.id == activeTextId).toList();
+      if (matchingText.isNotEmpty) {
+        selectedText = matchingText.first;
+      }
+    }
+
+    if (selectedText == null) {
+      final allSessions = storage.getAllSessions(languageCode: activeLang);
+      final readTextIds = allSessions.map((s) => s.textId).whereType<String>().toSet();
+      final unread = allTexts.where((t) => !readTextIds.contains(t.id)).toList();
+      if (unread.isNotEmpty) {
+        selectedText = unread.first;
+      } else if (allTexts.isNotEmpty) {
+        selectedText = allTexts.first;
+      }
     }
 
     final promotionReq = level <= 3 ? 3 : 5;
     final currentStreak = langProfile?.successfulSessionsInRow ?? 0;
 
-    state = TrainingProgramState(
-      languageCode: activeLang,
-      level: level,
-      targetWpm: targetWpm,
-      selectedText: selectedText,
-      sessionsRequiredForPromotion: promotionReq,
-      consecutiveSuccessfulSessions: currentStreak,
-    );
+    final activeStep = langProfile?.activeStepIndex;
+    if (activeStep != null && activeStep > 0 && activeStep <= 4) {
+      state = TrainingProgramState(
+        languageCode: activeLang,
+        level: level,
+        targetWpm: targetWpm,
+        selectedText: selectedText,
+        sessionsRequiredForPromotion: promotionReq,
+        consecutiveSuccessfulSessions: currentStreak,
+        currentStepIndex: activeStep,
+        warmUpErrors: langProfile?.activeWarmUpErrors,
+        warmUpDurationSecs: langProfile?.activeWarmUpDurationSecs,
+        recognitionAccuracy: langProfile?.activeRecognitionAccuracy,
+        recognitionErrors: langProfile?.activeRecognitionErrors,
+        readingWpm: langProfile?.activeReadingWpm,
+        wordsRead: langProfile?.activeWordsRead,
+        isSessionComplete: activeStep == 4,
+      );
+    } else {
+      state = TrainingProgramState(
+        languageCode: activeLang,
+        level: level,
+        targetWpm: targetWpm,
+        selectedText: selectedText,
+        sessionsRequiredForPromotion: promotionReq,
+        consecutiveSuccessfulSessions: currentStreak,
+      );
+    }
   }
 
   int _targetWpmForLevel(int lvl) {
@@ -160,20 +190,67 @@ class TrainingProgramNotifier extends Notifier<TrainingProgramState> {
     return 500 + (lvl - 5) * 100;
   }
 
+  Future<void> _saveActiveStateToDb({
+    required int currentStepIndex,
+    String? selectedTextId,
+    int? warmUpErrors,
+    int? warmUpDurationSecs,
+    int? recognitionAccuracy,
+    int? recognitionErrors,
+    int? readingWpm,
+    int? wordsRead,
+  }) async {
+    final storage = ref.read(storageServiceProvider);
+    final profile = await storage.getOrCreateTrainerProfile();
+    final langProfile = profile.languageProfiles[state.languageCode];
+    if (langProfile != null) {
+      langProfile.activeStepIndex = currentStepIndex;
+      langProfile.activeSelectedTextId = selectedTextId;
+      langProfile.activeWarmUpErrors = warmUpErrors;
+      langProfile.activeWarmUpDurationSecs = warmUpDurationSecs;
+      langProfile.activeRecognitionAccuracy = recognitionAccuracy;
+      langProfile.activeRecognitionErrors = recognitionErrors;
+      langProfile.activeReadingWpm = readingWpm;
+      langProfile.activeWordsRead = wordsRead;
+      await storage.saveTrainerProfile(profile);
+      if (ref.mounted) {
+        ref.invalidate(trainerProfileProvider);
+      }
+    }
+  }
+
+  Future<void> _clearActiveStateInDb() async {
+    final storage = ref.read(storageServiceProvider);
+    final profile = await storage.getOrCreateTrainerProfile();
+    final langProfile = profile.languageProfiles[state.languageCode];
+    if (langProfile != null) {
+      langProfile.activeStepIndex = null;
+      langProfile.activeSelectedTextId = null;
+      langProfile.activeWarmUpErrors = null;
+      langProfile.activeWarmUpDurationSecs = null;
+      langProfile.activeRecognitionAccuracy = null;
+      langProfile.activeRecognitionErrors = null;
+      langProfile.activeReadingWpm = null;
+      langProfile.activeWordsRead = null;
+      await storage.saveTrainerProfile(profile);
+      if (ref.mounted) {
+        ref.invalidate(trainerProfileProvider);
+      }
+    }
+  }
+
   void startSession() {
-    state = state.copyWith(
+    state = TrainingProgramState(
+      languageCode: state.languageCode,
+      level: state.level,
+      targetWpm: state.targetWpm,
+      selectedText: state.selectedText,
+      sessionsRequiredForPromotion: state.sessionsRequiredForPromotion,
+      consecutiveSuccessfulSessions: state.consecutiveSuccessfulSessions,
       currentStepIndex: 0,
       isSessionComplete: false,
-      warmUpErrors: null,
-      warmUpDurationSecs: null,
-      recognitionAccuracy: null,
-      recognitionErrors: null,
-      readingWpm: null,
-      wordsRead: null,
-      comprehensionRate: null,
-      qualified: false,
-      levelUpUnlocked: false,
     );
+    _clearActiveStateInDb();
   }
 
   void advanceStep() {
@@ -188,6 +265,12 @@ class TrainingProgramNotifier extends Notifier<TrainingProgramState> {
       warmUpDurationSecs: durationSecs,
       currentStepIndex: 1,
     );
+    _saveActiveStateToDb(
+      currentStepIndex: 1,
+      selectedTextId: state.selectedText?.id,
+      warmUpErrors: errors,
+      warmUpDurationSecs: durationSecs,
+    );
   }
 
   void logRecognition(int accuracy, int errors) {
@@ -196,6 +279,14 @@ class TrainingProgramNotifier extends Notifier<TrainingProgramState> {
       recognitionErrors: errors,
       currentStepIndex: 2,
     );
+    _saveActiveStateToDb(
+      currentStepIndex: 2,
+      selectedTextId: state.selectedText?.id,
+      warmUpErrors: state.warmUpErrors,
+      warmUpDurationSecs: state.warmUpDurationSecs,
+      recognitionAccuracy: accuracy,
+      recognitionErrors: errors,
+    );
   }
 
   void logReading(int rawWpm, int wordsCount) {
@@ -203,6 +294,16 @@ class TrainingProgramNotifier extends Notifier<TrainingProgramState> {
       readingWpm: rawWpm,
       wordsRead: wordsCount,
       currentStepIndex: 3,
+    );
+    _saveActiveStateToDb(
+      currentStepIndex: 3,
+      selectedTextId: state.selectedText?.id,
+      warmUpErrors: state.warmUpErrors,
+      warmUpDurationSecs: state.warmUpDurationSecs,
+      recognitionAccuracy: state.recognitionAccuracy,
+      recognitionErrors: state.recognitionErrors,
+      readingWpm: rawWpm,
+      wordsRead: wordsCount,
     );
   }
 

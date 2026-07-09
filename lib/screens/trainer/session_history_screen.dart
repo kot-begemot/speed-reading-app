@@ -245,33 +245,43 @@ class _SessionRow extends StatelessWidget {
     final hasReading = session.finalWpm > 0;
     final hasBaseline = session.exerciseResults.any((e) => e.exerciseType == 'baseline_reading');
     if (hasBaseline) return 'Baseline Assessment';
-    if (hasReading) return 'Training Session';
-    final drillType = session.exerciseResults.isNotEmpty ? session.exerciseResults.first.exerciseType : '';
-    switch (drillType) {
-      case 'schulte':
-        return 'Schulte Table';
-      case 'flash_recognition':
-        return 'Flash Recognition';
-      case 'number_tracking':
-        return 'Number Tracking';
-      case 'peripheral_vision':
-        return 'Peripheral Vision';
-      default:
-        return 'Practice Session';
+    if (hasReading) return 'Training Program · Level ${session.level}';
+    final r = session.exerciseResults.isNotEmpty ? session.exerciseResults.first : null;
+    if (r != null) {
+      final type = r.exerciseType;
+      switch (type) {
+        case 'schulte':
+          return 'Schulte Table';
+        case 'flash_recognition':
+          return 'Flash Recognition';
+        case 'number_tracking':
+          return 'Number Tracking';
+        case 'peripheral_vision':
+          return 'Peripheral Vision';
+      }
     }
+    return 'Practice Session';
   }
 
   String get _meta {
-    if (session.finalWpm > 0) {
+    final hasReading = session.finalWpm > 0;
+    final hasBaseline = session.exerciseResults.any((e) => e.exerciseType == 'baseline_reading');
+    if (hasBaseline || hasReading) {
       return '${session.finalWpm} wpm · ${session.comprehensionPercent}% · eff ${session.effectiveWpm} · Lv${session.level}';
     }
-    final results = session.exerciseResults;
-    if (results.isEmpty) return 'No data';
-    final r = results.first;
-    if (r.accuracyPercent != null) {
-      return '${r.durationSeconds}s · ${r.accuracyPercent!.round()}% accuracy';
+    final r = session.exerciseResults.isNotEmpty ? session.exerciseResults.first : null;
+    if (r != null) {
+      final type = r.exerciseType;
+      final mistakesStr = r.mistakes == 1 ? '1 mistake' : '${r.mistakes ?? 0} mistakes';
+      if (type == 'schulte' || type == 'number_tracking') {
+        return '${r.durationSeconds}s · $mistakesStr';
+      } else if (type == 'flash_recognition' || type == 'peripheral_vision') {
+        final accuracyStr = r.accuracyPercent != null ? '${r.accuracyPercent!.round()}% accuracy' : '100% accuracy';
+        return '$accuracyStr · $mistakesStr';
+      }
+      return '${r.durationSeconds}s · Lv${r.difficulty}';
     }
-    return '${r.durationSeconds}s · Lv${r.difficulty}';
+    return 'No data';
   }
 
   String get _time {

@@ -175,4 +175,108 @@ void main() {
     expect(currentProfile.languageProfiles['en']!.successfulSessionsInRow, 0);
     expect(currentProfile.languageProfiles['en']!.currentLevel, 2); // did not lose level
   });
+
+  test('Training Program Mid-Session Progress Persistence and Recovery', () async {
+    // 1. Setup profile where English baseline is already completed
+    final profile = await storage.getOrCreateTrainerProfile();
+    profile.languageProfiles['en'] = TrainerLanguageProfile(
+      languageCode: 'en',
+      currentLevel: 1,
+      bestEffectiveWpm: 150,
+      successfulSessionsInRow: 0,
+      baselineCompletedAt: DateTime.now(),
+    );
+    await storage.saveTrainerProfile(profile);
+
+    var ref = ProviderContainer(
+      overrides: [
+        storageServiceProvider.overrideWithValue(storage),
+      ],
+    );
+    addTearDown(() => ref.dispose());
+
+    // Trigger initialization
+    ref.read(trainingProgramProvider);
+    await ref.read(trainerProfileProvider.future);
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    var state = ref.read(trainingProgramProvider);
+    expect(state.currentStepIndex, 0);
+    expect(state.warmUpErrors, null);
+
+    final notifier = ref.read(trainingProgramProvider.notifier);
+
+    // 2. Perform step 1
+    notifier.logWarmUp(3, 42);
+    state = ref.read(trainingProgramProvider);
+    expect(state.currentStepIndex, 1);
+    expect(state.warmUpErrors, 3);
+    expect(state.warmUpDurationSecs, 42);
+
+    // Yield execution to allow async DB writes to complete
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    // Verify written to database
+    var dbProfile = await storage.getOrCreateTrainerProfile();
+    var langProfile = dbProfile.languageProfiles['en']!;
+    expect(langProfile.activeStepIndex, 1);
+    expect(langProfile.activeWarmUpErrors, 3);
+    expect(langProfile.activeWarmUpDurationSecs, 42);
+    expect(langProfile.activeSelectedTextId, state.selectedText?.id);
+
+    // 3. Simulate provider disposal and reload (app restart / screen reload)
+    ref.dispose();
+    ref = ProviderContainer(
+      overrides: [
+        storageServiceProvider.overrideWithValue(storage),
+      ],
+    );
+
+    // Initialize again
+    ref.read(trainingProgramProvider);
+    await ref.read(trainerProfileProvider.future);
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    state = ref.read(trainingProgramProvider);
+    // Should have restored from database!
+    expect(state.currentStepIndex, 1);
+    expect(state.warmUpErrors, 3);
+    expect(state.warmUpDurationSecs, 42);
+    expect(state.selectedText, isNotNull);
+
+    // 4. Perform step 2
+    ref.read(trainingProgramProvider.notifier).logRecognition(95, 1);
+    state = ref.read(trainingProgramProvider);
+    expect(state.currentStepIndex, 2);
+    expect(state.recognitionAccuracy, 95);
+    expect(state.recognitionErrors, 1);
+
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    // Verify DB profile updated
+    dbProfile = await storage.getOrCreateTrainerProfile();
+    langProfile = dbProfile.languageProfiles['en']!;
+    expect(langProfile.activeStepIndex, 2);
+    expect(langProfile.activeWarmUpErrors, 3);
+    expect(langProfile.activeWarmUpDurationSecs, 42);
+    expect(langProfile.activeRecognitionAccuracy, 95);
+    expect(langProfile.activeRecognitionErrors, 1);
+
+    // 5. Cancel/Start new session and verify DB cleared
+    ref.read(trainingProgramProvider.notifier).startSession();
+    state = ref.read(trainingProgramProvider);
+    expect(state.currentStepIndex, 0);
+    expect(state.warmUpErrors, null);
+
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    dbProfile = await storage.getOrCreateTrainerProfile();
+    langProfile = dbProfile.languageProfiles['en']!;
+    expect(langProfile.activeStepIndex, isNull);
+    expect(langProfile.activeSelectedTextId, isNull);
+    expect(langProfile.activeWarmUpErrors, isNull);
+    expect(langProfile.activeWarmUpDurationSecs, isNull);
+    expect(langProfile.activeRecognitionAccuracy, isNull);
+    expect(langProfile.activeRecognitionErrors, isNull);
+  });
 }

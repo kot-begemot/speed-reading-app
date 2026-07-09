@@ -67,13 +67,21 @@ class TrainerLanguageProfileAdapter
       bestEffectiveWpm: fields[3] == null ? 0 : (fields[3] as num).toInt(),
       baselineCompletedAt: fields[4] as DateTime?,
       lastSessionAt: fields[5] as DateTime?,
+      activeStepIndex: (fields[6] as num?)?.toInt(),
+      activeSelectedTextId: fields[7] as String?,
+      activeWarmUpErrors: (fields[8] as num?)?.toInt(),
+      activeWarmUpDurationSecs: (fields[9] as num?)?.toInt(),
+      activeRecognitionAccuracy: (fields[10] as num?)?.toInt(),
+      activeRecognitionErrors: (fields[11] as num?)?.toInt(),
+      activeReadingWpm: (fields[12] as num?)?.toInt(),
+      activeWordsRead: (fields[13] as num?)?.toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, TrainerLanguageProfile obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.languageCode)
       ..writeByte(1)
@@ -85,7 +93,23 @@ class TrainerLanguageProfileAdapter
       ..writeByte(4)
       ..write(obj.baselineCompletedAt)
       ..writeByte(5)
-      ..write(obj.lastSessionAt);
+      ..write(obj.lastSessionAt)
+      ..writeByte(6)
+      ..write(obj.activeStepIndex)
+      ..writeByte(7)
+      ..write(obj.activeSelectedTextId)
+      ..writeByte(8)
+      ..write(obj.activeWarmUpErrors)
+      ..writeByte(9)
+      ..write(obj.activeWarmUpDurationSecs)
+      ..writeByte(10)
+      ..write(obj.activeRecognitionAccuracy)
+      ..writeByte(11)
+      ..write(obj.activeRecognitionErrors)
+      ..writeByte(12)
+      ..write(obj.activeReadingWpm)
+      ..writeByte(13)
+      ..write(obj.activeWordsRead);
   }
 
   @override
