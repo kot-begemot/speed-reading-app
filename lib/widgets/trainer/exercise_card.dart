@@ -17,6 +17,7 @@ class ExerciseCard extends StatelessWidget {
   final ExerciseStatus status;
   final VoidCallback? onStart;
   final bool highlighted;
+  final int? unlockLevel;
 
   const ExerciseCard({
     super.key,
@@ -29,14 +30,22 @@ class ExerciseCard extends StatelessWidget {
     this.status = ExerciseStatus.available,
     this.onStart,
     this.highlighted = false,
+    this.unlockLevel,
   });
 
-  (String, Color, Color) get _chip => switch (status) {
-        ExerciseStatus.recommended => ('RECOMMENDED', T.success, T.successBg),
-        ExerciseStatus.completed => ('COMPLETED', T.primary, T.primaryBg),
-        ExerciseStatus.locked => ('LOCKED', T.textSecondary, T.surfaceLow),
-        ExerciseStatus.available => ('AVAILABLE', T.textSecondary, T.surfaceLow),
-      };
+  (String, Color, Color) get _chip {
+    switch (status) {
+      case ExerciseStatus.recommended:
+        return ('RECOMMENDED', T.success, T.successBg);
+      case ExerciseStatus.completed:
+        return ('COMPLETED', T.primary, T.primaryBg);
+      case ExerciseStatus.locked:
+        final text = unlockLevel != null ? 'LVL $unlockLevel REQUIRED' : 'LOCKED';
+        return (text, T.textSecondary, T.surfaceLow);
+      case ExerciseStatus.available:
+        return ('AVAILABLE', T.textSecondary, T.surfaceLow);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +119,32 @@ class ExerciseCard extends StatelessWidget {
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(color: T.primary, borderRadius: BorderRadius.circular(20)),
-                      child: const Row(
+                      decoration: BoxDecoration(
+                        color: status == ExerciseStatus.locked ? T.surfaceLow : T.primary,
+                        borderRadius: BorderRadius.circular(20),
+                        border: status == ExerciseStatus.locked
+                            ? Border.all(color: T.border, width: 0.8)
+                            : null,
+                      ),
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Start',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: T.onPrimary)),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward_rounded, size: 16, color: T.onPrimary),
+                          Text(
+                            status == ExerciseStatus.locked ? 'Locked' : 'Start',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: status == ExerciseStatus.locked ? T.textSecondary : T.onPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            status == ExerciseStatus.locked
+                                ? Icons.lock_outline_rounded
+                                : Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: status == ExerciseStatus.locked ? T.textSecondary : T.onPrimary,
+                          ),
                         ],
                       ),
                     ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/baseline_provider.dart';
 import '../../providers/progress_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../widgets/trainer/exercise_card.dart';
 import 'flash_recognition_runtime_screen.dart';
 import 'number_tracking_runtime_screen.dart';
@@ -24,6 +25,7 @@ class _DrillDef {
   final String title;
   final String purpose;
   final bool hasRuntime;
+  final int unlockLevel;
 
   const _DrillDef({
     required this.type,
@@ -32,6 +34,7 @@ class _DrillDef {
     required this.title,
     required this.purpose,
     this.hasRuntime = true,
+    required this.unlockLevel,
   });
 }
 
@@ -42,6 +45,7 @@ const _drills = <_DrillDef>[
     accent: T.accentViolet,
     title: 'Schulte Table',
     purpose: 'Peripheral vision & visual search',
+    unlockLevel: 1,
   ),
   _DrillDef(
     type: 'schulte_gorbov',
@@ -49,6 +53,7 @@ const _drills = <_DrillDef>[
     accent: T.accentViolet,
     title: 'Schulte-Gorbov Table',
     purpose: 'Alternating red & black search',
+    unlockLevel: 3,
   ),
   _DrillDef(
     type: 'number_tracking',
@@ -56,6 +61,7 @@ const _drills = <_DrillDef>[
     accent: T.accentTeal,
     title: 'Number Tracking',
     purpose: 'Attention & sequence tracking',
+    unlockLevel: 2,
   ),
   _DrillDef(
     type: 'peripheral_vision',
@@ -63,6 +69,7 @@ const _drills = <_DrillDef>[
     accent: T.warning,
     title: 'Peripheral Vision',
     purpose: 'Recognize words at the edges',
+    unlockLevel: 3,
   ),
   _DrillDef(
     type: 'flash_recognition',
@@ -70,6 +77,7 @@ const _drills = <_DrillDef>[
     accent: T.primary,
     title: 'Flash Recognition',
     purpose: 'Instant word & phrase recognition',
+    unlockLevel: 4,
   ),
   _DrillDef(
     type: 'chunk_reading',
@@ -77,6 +85,7 @@ const _drills = <_DrillDef>[
     accent: T.textSecondary,
     title: 'Chunk Reading',
     purpose: 'Read in 2–4 word groups',
+    unlockLevel: 4,
   ),
   _DrillDef(
     type: 'pyramid_expansion',
@@ -84,6 +93,7 @@ const _drills = <_DrillDef>[
     accent: T.accentTeal,
     title: 'Pyramid Expansion',
     purpose: 'Vertical focus & visual expansion',
+    unlockLevel: 2,
   ),
   _DrillDef(
     type: 'word_match',
@@ -91,6 +101,7 @@ const _drills = <_DrillDef>[
     accent: T.warning,
     title: 'Visual Word Match',
     purpose: 'Rapid word shape recognition',
+    unlockLevel: 1,
   ),
 ];
 
@@ -158,9 +169,71 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
+  void _showLockedDialog(BuildContext context, _DrillDef drill) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: T.surface,
+          surfaceTintColor: T.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.lock_outline_rounded, color: drill.accent, size: 24),
+              const SizedBox(width: 8),
+              const Text(
+                'Skill Locked',
+                style: TextStyle(fontWeight: FontWeight.w800, color: T.textPrimary),
+              ),
+            ],
+          ),
+          content: Text(
+            'To practice "${drill.title}", you need to reach Level ${drill.unlockLevel} in the Training Program.\n\nYour current level is based on your daily training progression.',
+            style: const TextStyle(fontSize: 14, color: T.textSecondary, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Close',
+                style: TextStyle(fontWeight: FontWeight.w700, color: T.textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // close dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TrainingProgramPlanScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: T.primary,
+                foregroundColor: T.onPrimary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text(
+                'Go to Program',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(activeTrainerLanguageProvider);
+    final settings = ref.watch(settingsProvider);
+    final profileAsync = ref.watch(trainerProfileProvider);
+    final currentLevel = profileAsync.maybeWhen(
+      data: (p) => p.languageProfiles[lang]?.currentLevel ?? 1,
+      orElse: () => 1,
+    );
+
     final weakSkills = ref.watch(weakSkillsProvider(lang));
     final weakTypes = weakSkills.map((s) => s.exerciseType).toSet();
 
@@ -253,7 +326,8 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
                       itemBuilder: (context, index) {
                         final d = visible[index];
                         final stat = stats[d.type] ?? DrillStat.empty;
-                        final status = !d.hasRuntime
+                        final isLevelLocked = !settings.unlockAllSkills && currentLevel < d.unlockLevel;
+                        final status = !d.hasRuntime || isLevelLocked
                             ? ExerciseStatus.locked
                             : recommendedTypes.contains(d.type)
                                 ? ExerciseStatus.recommended
@@ -271,7 +345,16 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
                             last: stat.last ?? '—',
                             status: status,
                             highlighted: widget.exerciseType == d.type,
-                            onStart: () => _start(lang, d),
+                            unlockLevel: d.unlockLevel,
+                            onStart: () {
+                              if (!d.hasRuntime) {
+                                _start(lang, d);
+                              } else if (isLevelLocked) {
+                                _showLockedDialog(context, d);
+                              } else {
+                                _start(lang, d);
+                              }
+                            },
                           ),
                         );
                       },

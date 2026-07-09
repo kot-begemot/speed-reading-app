@@ -195,6 +195,20 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+          _buildSection(
+            'Trainer Options',
+            theme,
+            [
+              SettingTile(
+                title: 'Unlock all skills',
+                subtitle: 'Bypass level locks for practice drills',
+                trailing: Switch(
+                  value: settings.unlockAllSkills,
+                  onChanged: notifier.setUnlockAllSkills,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
