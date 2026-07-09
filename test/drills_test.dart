@@ -16,6 +16,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: SchulteRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;

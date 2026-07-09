@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -63,10 +64,17 @@ class StorageService {
     final sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
     final textBox = await Hive.openBox<TrainingText>('training_texts');
 
-    final base = docsDir ?? await getApplicationDocumentsDirectory();
+    final Directory base;
+    if (kIsWeb) {
+      base = Directory('web_placeholder');
+    } else {
+      base = docsDir ?? await getApplicationDocumentsDirectory();
+    }
     final booksDir = Directory(p.join(base.path, 'books'));
-    if (!booksDir.existsSync()) {
-      booksDir.createSync(recursive: true);
+    if (!kIsWeb) {
+      if (!booksDir.existsSync()) {
+        booksDir.createSync(recursive: true);
+      }
     }
     return StorageService._(
       box,
@@ -108,15 +116,25 @@ class StorageService {
 
   /// Persists a new book: writes its text to disk, then the metadata record.
   Future<void> addBook(BookMeta meta, String text) async {
-    await _textFile(meta.id).writeAsString(text);
+    if (!kIsWeb) {
+      await _textFile(meta.id).writeAsString(text);
+    }
     await _box.put(meta.id, meta);
   }
 
   /// Reads a book's full text from disk. Throws if the file is missing — the
   /// reader surfaces this as a graceful error (Stage 7).
-  Future<String> readBookText(String id) => _textFile(id).readAsString();
+  Future<String> readBookText(String id) {
+    if (kIsWeb) {
+      return Future.value("Placeholder text on web since local files are not supported in browser.");
+    }
+    return _textFile(id).readAsString();
+  }
 
-  bool hasText(String id) => _textFile(id).existsSync();
+  bool hasText(String id) {
+    if (kIsWeb) return true;
+    return _textFile(id).existsSync();
+  }
 
   Future<void> updateBook(BookMeta meta) => _box.put(meta.id, meta);
 
