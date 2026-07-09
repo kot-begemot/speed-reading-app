@@ -182,10 +182,10 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 56,
+              height: 48,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 children: [
                   _FilterChip(
                     label: 'Program',
@@ -283,25 +283,28 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected ? T.primary : T.surfaceLowest,
-            borderRadius: BorderRadius.circular(20),
-            border: selected ? null : Border.all(color: T.border, width: 0.8),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-              color: selected ? T.onPrimary : T.textSecondary,
+    return SizedBox(
+      height: 36,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: selected ? T.primary : T.surfaceLowest,
+              borderRadius: BorderRadius.circular(18),
+              border: selected ? null : Border.all(color: T.border, width: 0.8),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                color: selected ? T.onPrimary : T.textSecondary,
+              ),
             ),
           ),
         ),

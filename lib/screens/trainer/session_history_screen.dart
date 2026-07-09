@@ -135,30 +135,37 @@ class _FilterChips extends StatelessWidget {
       _Filter.drills: 'Drills',
     };
     return SizedBox(
-      height: 46,
+      height: 48,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         children: _Filter.values.map((f) {
           final selected = f == current;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () => onSelect(f),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: selected ? T.primary : T.surfaceLowest,
-                  borderRadius: BorderRadius.circular(20),
-                  border: selected ? null : Border.all(color: T.border, width: 0.8),
-                ),
-                child: Text(
-                  labels[f]!,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                    color: selected ? T.onPrimary : T.textSecondary,
+            child: SizedBox(
+              height: 36,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => onSelect(f),
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: selected ? T.primary : T.surfaceLowest,
+                      borderRadius: BorderRadius.circular(18),
+                      border: selected ? null : Border.all(color: T.border, width: 0.8),
+                    ),
+                    child: Text(
+                      labels[f]!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                        color: selected ? T.onPrimary : T.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
               ),
