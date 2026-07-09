@@ -66,6 +66,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: NumberTrackingRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -122,6 +123,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: PeripheralVisionRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -169,6 +171,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: FlashRecognitionRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;

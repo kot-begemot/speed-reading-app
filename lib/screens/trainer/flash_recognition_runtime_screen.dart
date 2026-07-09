@@ -19,10 +19,12 @@ class _FlashRound {
 /// for a brief period (e.g. 300ms), and asks the user to identify what they saw.
 class FlashRecognitionRuntimeScreen extends StatefulWidget {
   final void Function(int score, int errors, int durationSecs)? onComplete;
+  final bool showIntro;
 
   const FlashRecognitionRuntimeScreen({
     super.key,
     this.onComplete,
+    this.showIntro = true,
   });
 
   @override
@@ -53,6 +55,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
   int _streak = 0;
   int _maxStreak = 0;
   bool _isFinished = false;
+  late bool _showIntro;
 
   // Flash phases: 'waiting', 'flashing', 'answering', 'feedback'
   String _flashPhase = 'waiting'; 
@@ -64,7 +67,12 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
   @override
   void initState() {
     super.initState();
-    _startNewGame();
+    _showIntro = widget.showIntro;
+    if (_showIntro) {
+      _rounds = [];
+    } else {
+      _startNewGame();
+    }
   }
 
   @override
@@ -197,8 +205,300 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
     return (_correctCount / totalRoundsPlayed * 100).round();
   }
 
+  void _startFromIntro() {
+    setState(() {
+      _showIntro = false;
+      _startNewGame();
+    });
+  }
+
+  Widget _buildIntroScreen() {
+    return Scaffold(
+      backgroundColor: T.surface,
+      appBar: AppBar(
+        backgroundColor: T.surface,
+        surfaceTintColor: T.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Exercise Intro',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: T.textPrimary,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SafeArea(
+              bottom: false,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                children: [
+                  _introHead(),
+                  const SizedBox(height: 24),
+                  _introGoalCard(),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'HOW TO PLAY',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _instructionsCard(),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'BENEFITS',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _benefitsCard(),
+                ],
+              ),
+            ),
+          ),
+          _introActions(),
+        ],
+      ),
+    );
+  }
+
+  Widget _introHead() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: T.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.bolt, size: 30, color: T.primary),
+        ),
+        const SizedBox(width: 14),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Flash Recognition',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: T.textPrimary,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Instant word & phrase recognition',
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.3,
+                  color: T.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _introGoalCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: T.successBg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.center_focus_strong, size: 22, color: T.success),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SUCCESS GOAL',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: T.success,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Recognize flashed phrases · 10 rounds',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: T.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _instructionsCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: T.card(radius: 16),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InstructionRow(
+            number: '1',
+            text: 'Focus on the screen: Keep your gaze fixed on the center of the display.',
+          ),
+          SizedBox(height: 16),
+          _InstructionRow(
+            number: '2',
+            text: 'Flashing phrase: A phrase will flash extremely quickly (300ms) behind a visual mask.',
+          ),
+          SizedBox(height: 16),
+          _InstructionRow(
+            number: '3',
+            text: 'Identify the phrase: Choose the phrase you saw from the options list.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _benefitsCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: T.card(radius: 16),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '• Enhance Subvocalization Control: Trains your brain to process phrases instantly without saying them in your head.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '• Increase Visual Intake Speed: Trains your visual perception to capture meaning in milliseconds.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '• Develop Pattern Recognition: Enhances rapid word chunk recognition and semantic translation.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _introActions() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: T.surfaceLowest,
+        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    side: const BorderSide(color: T.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Back',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: _startFromIntro,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: T.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Start',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_showIntro) {
+      return _buildIntroScreen();
+    }
     return Scaffold(
       backgroundColor: T.surface,
       body: SafeArea(
@@ -637,3 +937,48 @@ class _Metric extends StatelessWidget {
     );
   }
 }
+
+class _InstructionRow extends StatelessWidget {
+  final String number;
+  final String text;
+
+  const _InstructionRow({required this.number, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: T.surfaceLow,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            number,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: T.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: T.textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
