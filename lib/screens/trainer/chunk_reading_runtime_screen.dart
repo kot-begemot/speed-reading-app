@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'trainer_tokens.dart';
+import '../../services/distractor_generator.dart';
+import '../../models/book_meta.dart';
+import '../../providers/books_provider.dart';
 
 class _ChunkQuestion {
   final String question;
@@ -16,7 +21,19 @@ class _ChunkQuestion {
   });
 }
 
-class ChunkReadingRuntimeScreen extends StatefulWidget {
+class _ChunkArticle {
+  final String title;
+  final String content;
+  final List<_ChunkQuestion> questions;
+
+  const _ChunkArticle({
+    required this.title,
+    required this.content,
+    required this.questions,
+  });
+}
+
+class ChunkReadingRuntimeScreen extends ConsumerStatefulWidget {
   final void Function(int wpm, int errors, int durationSecs)? onComplete;
   final bool showIntro;
 
@@ -27,35 +44,119 @@ class ChunkReadingRuntimeScreen extends StatefulWidget {
   });
 
   @override
-  State<ChunkReadingRuntimeScreen> createState() => ChunkReadingRuntimeScreenState();
+  ConsumerState<ChunkReadingRuntimeScreen> createState() => ChunkReadingRuntimeScreenState();
 }
 
-class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
-  static const String _textContent =
-      "Speed reading is not just about reading fast; it is about comprehension and focus. "
-      "When you read chunk-by-chunk, your eyes group multiple words into a single fixation. "
-      "This reduces the number of times your eyes stop on each line. "
-      "It also prevents subvocalization, which is the habit of saying words silently in your head. "
-      "By training with chunks, you will develop a wider span of recognition and process thoughts instantly.";
-
-  static const List<_ChunkQuestion> _questions = [
-    _ChunkQuestion(
-      question: "What is speed reading NOT just about?",
-      options: ["Reading fast", "Comprehension", "Focus", "Visual training"],
-      correctAnswer: "Reading fast",
+class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeScreen> {
+  static const List<_ChunkArticle> _articles = [
+    _ChunkArticle(
+      title: "The Art of Focus",
+      content: "Focus is the cornerstone of effective reading. In our modern world, constant notifications and quick distractions fragment our attention span. To read faster, you must train your mind to stay fully present on the text. Daily mindfulness and eye tracking exercises build the mental stamina required for high-speed comprehension. By eliminating external and internal distractions, your brain processes visual symbols at its maximum capacity.",
+      questions: [
+        _ChunkQuestion(
+          question: "What is the cornerstone of effective reading?",
+          options: ["Focus", "Speed", "Memory", "Vocabulary"],
+          correctAnswer: "Focus",
+        ),
+        _ChunkQuestion(
+          question: "What fragments our attention span in the modern world?",
+          options: ["Constant notifications", "Exercise", "Reading books", "Sleep"],
+          correctAnswer: "Constant notifications",
+        ),
+        _ChunkQuestion(
+          question: "What does mindfulness and eye tracking build?",
+          options: ["Mental stamina", "Physical strength", "Eye color", "Subvocalization"],
+          correctAnswer: "Mental stamina",
+        ),
+      ],
     ),
-    _ChunkQuestion(
-      question: "What habit does chunk reading help prevent?",
-      options: ["Subvocalization", "Regression", "Vocalization", "Blinking"],
-      correctAnswer: "Subvocalization",
+    _ChunkArticle(
+      title: "History of Speed Reading",
+      content: "Speed reading research gained popularity in the mid-twentieth century. Educator Evelyn Wood observed that some people naturally read exceptionally fast by scanning pages vertically instead of horizontally. She developed training programs to help students group words and minimize regression. Early methods also used the tachistoscope, a projection device that flashed words for fractions of a second, training the eyes to register shapes instantly.",
+      questions: [
+        _ChunkQuestion(
+          question: "Who observed natural vertical scanning in reading?",
+          options: ["Evelyn Wood", "Albert Einstein", "Thomas Edison", "Isaac Newton"],
+          correctAnswer: "Evelyn Wood",
+        ),
+        _ChunkQuestion(
+          question: "What did Evelyn Wood notice fast readers did?",
+          options: ["Scan vertically", "Say words aloud", "Blink frequently", "Close one eye"],
+          correctAnswer: "Scan vertically",
+        ),
+        _ChunkQuestion(
+          question: "What was a tachistoscope used for?",
+          options: ["Flashing words quickly", "Measuring eye pressure", "Printing books", "Recording voice"],
+          correctAnswer: "Flashing words quickly",
+        ),
+      ],
     ),
-    _ChunkQuestion(
-      question: "What does grouping words into a single fixation reduce?",
-      options: ["Eye stops", "Word count", "Comprehension", "WPM"],
-      correctAnswer: "Eye stops",
+    _ChunkArticle(
+      title: "Subvocalization: The Silent Barrier",
+      content: "Subvocalization is the habit of pronouncing each word silently in your head while reading. While it helps children learn to read, it becomes a speed barrier for adults. The average speaking speed is about one hundred and fifty words per minute, which caps your silent reading speed. Speed reading training focuses on bypass techniques, teaching the brain to translate visual symbols directly into semantic meaning without auditory conversion.",
+      questions: [
+        _ChunkQuestion(
+          question: "What is subvocalization?",
+          options: ["Pronouncing words silently", "Reading aloud", "Moving eyes backward", "Skipping paragraphs"],
+          correctAnswer: "Pronouncing words silently",
+        ),
+        _ChunkQuestion(
+          question: "What is the average adult speaking speed (WPM)?",
+          options: ["150 WPM", "300 WPM", "50 WPM", "500 WPM"],
+          correctAnswer: "150 WPM",
+        ),
+        _ChunkQuestion(
+          question: "What does speed reading bypass to improve speed?",
+          options: ["Auditory conversion", "Visual parsing", "Punctuation marks", "Book titles"],
+          correctAnswer: "Auditory conversion",
+        ),
+      ],
+    ),
+    _ChunkArticle(
+      title: "How the Eye Reads",
+      content: "Our eyes do not glide smoothly across a line of text. Instead, they make quick, jerky movements called saccades, followed by brief pauses called fixations. It is during these fixations, which last about a quarter of a second, that the brain actually processes the words. Speed reading exercises train the eyes to make wider saccades and shorter fixations, allowing you to capture more words in less time.",
+      questions: [
+        _ChunkQuestion(
+          question: "What are the quick, jerky movements of the eye called?",
+          options: ["Saccades", "Fixations", "Nystagmus", "Refractions"],
+          correctAnswer: "Saccades",
+        ),
+        _ChunkQuestion(
+          question: "When does the brain actually process words?",
+          options: ["During fixations", "During saccades", "During blinking", "During sleep"],
+          correctAnswer: "During fixations",
+        ),
+        _ChunkQuestion(
+          question: "How long does a typical fixation pause last?",
+          options: ["A quarter of a second", "One full second", "Five seconds", "Two milliseconds"],
+          correctAnswer: "A quarter of a second",
+        ),
+      ],
+    ),
+    _ChunkArticle(
+      title: "Neuroplasticity in Learning",
+      content: "The human brain is remarkably adaptable, a concept known as neuroplasticity. When you practice speed reading, you are not just exercising your eye muscles; you are rewiring neural pathways. With consistent training, the visual cortex learns to recognize word patterns faster, and the prefrontal cortex processes information more efficiently. This means that speed reading is a trainable skill that gets easier with daily practice.",
+      questions: [
+        _ChunkQuestion(
+          question: "What is the brain's ability to adapt called?",
+          options: ["Neuroplasticity", "Cardio", "Photosynthesis", "Metabolism"],
+          correctAnswer: "Neuroplasticity",
+        ),
+        _ChunkQuestion(
+          question: "What does speed reading training rewire?",
+          options: ["Neural pathways", "Muscle tissue", "Optic nerves", "Ear canals"],
+          correctAnswer: "Neural pathways",
+        ),
+        _ChunkQuestion(
+          question: "Where does the brain process information more efficiently after training?",
+          options: ["Prefrontal cortex", "Spinal cord", "Cerebellum", "Occipital lobe"],
+          correctAnswer: "Prefrontal cortex",
+        ),
+      ],
     ),
   ];
 
+  int _selectedArticleIndex = 0;
   late List<String> _chunks;
   int _activeChunkIndex = -1; // -1 means waiting to start
   bool _isPlaying = false;
@@ -70,6 +171,17 @@ class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
 
   bool _isFinished = false;
   late bool _showIntro;
+
+  String? _loadedBookText;
+  List<_ChunkQuestion>? _dynamicQuestions;
+  int _actualWordsRead = 0;
+
+  List<_ChunkQuestion> get _questions => (_selectedArticleIndex >= _articles.length)
+      ? (_dynamicQuestions ?? const [])
+      : _articles[_selectedArticleIndex].questions;
+  String get _textContent => (_selectedArticleIndex >= _articles.length)
+      ? (_loadedBookText ?? "")
+      : _articles[_selectedArticleIndex].content;
 
   List<String> get chunks => _chunks;
   int get activeChunkIndex => _activeChunkIndex;
@@ -111,6 +223,131 @@ class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
     setState(() {
       _chunks = temp;
     });
+  }
+
+  Future<void> _loadBookContent(BookMeta book) async {
+    try {
+      final storage = ref.read(storageServiceProvider);
+      final fullText = await storage.readBookText(book.id);
+      
+      final allWords = fullText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+      final startIndex = book.currentWordIndex;
+      
+      final actualStart = (startIndex >= allWords.length) ? 0 : startIndex;
+      final actualEnd = (actualStart + 100 < allWords.length) ? actualStart + 100 : allWords.length;
+      
+      final passageWords = allWords.sublist(actualStart, actualEnd);
+      final passageText = passageWords.join(' ');
+
+      final questions = _generateClozeQuestions(passageWords);
+
+      setState(() {
+        _loadedBookText = passageText;
+        _dynamicQuestions = questions;
+        _actualWordsRead = passageWords.length;
+        _buildChunks();
+      });
+    } catch (e) {
+      setState(() {
+        _loadedBookText = "Failed to load book content. Please try importing the book again or select a different one.";
+        _dynamicQuestions = const [];
+        _actualWordsRead = 0;
+        _buildChunks();
+      });
+    }
+  }
+
+  List<_ChunkQuestion> _generateClozeQuestions(List<String> words) {
+    final List<_ChunkQuestion> generated = [];
+    final rand = Random();
+    
+    final passageText = words.join(' ');
+    final sentencePattern = RegExp(r'[^.!?]+[.!?]');
+    final matches = sentencePattern.allMatches(passageText).map((m) => m.group(0)!.trim()).where((s) => s.split(RegExp(r'\s+')).length >= 8).toList();
+
+    final List<String> sentencesToUse = [];
+    if (matches.length >= 3) {
+      sentencesToUse.add(matches[0]);
+      sentencesToUse.add(matches[matches.length ~/ 2]);
+      sentencesToUse.add(matches[matches.length - 1]);
+    } else {
+      for (final s in matches) {
+        sentencesToUse.add(s);
+      }
+      while (sentencesToUse.length < 3 && words.length >= 10) {
+        final startIdx = rand.nextInt(words.length - 10);
+        sentencesToUse.add(words.sublist(startIdx, startIdx + 10).join(' ') + '...');
+      }
+    }
+
+    for (final sentence in sentencesToUse) {
+      final sentenceWords = sentence.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+      if (sentenceWords.isEmpty) continue;
+
+      final cleanWords = sentenceWords.map((w) => w.replaceAll(RegExp(r'[^a-zA-Z]'), '')).toList();
+      final List<int> candidates = [];
+      for (int i = 0; i < cleanWords.length; i++) {
+        if (cleanWords[i].length >= 5) {
+          candidates.add(i);
+        }
+      }
+
+      if (candidates.isEmpty) {
+        for (int i = 0; i < cleanWords.length; i++) {
+          if (cleanWords[i].length >= 3) {
+            candidates.add(i);
+          }
+        }
+      }
+
+      if (candidates.isEmpty) continue;
+
+      final omitIdx = candidates[rand.nextInt(candidates.length)];
+      final correctWordClean = cleanWords[omitIdx];
+      final correctWordOriginal = sentenceWords[omitIdx];
+
+      final questionText = sentence.replaceFirst(correctWordOriginal, '_______');
+
+      final allUniqueCleanWords = words
+          .map((w) => w.replaceAll(RegExp(r'[^a-zA-Z]'), ''))
+          .where((w) => w.length >= 4 && w.toLowerCase() != correctWordClean.toLowerCase())
+          .toSet()
+          .toList();
+
+      allUniqueCleanWords.shuffle();
+      final distractors = <String>[];
+      for (final w in allUniqueCleanWords) {
+        if (distractors.length >= 3) break;
+        distractors.add(w);
+      }
+
+      while (distractors.length < 3) {
+        final w = DistractorGenerator.getRandomWord();
+        if (w.toLowerCase() != correctWordClean.toLowerCase() && !distractors.contains(w)) {
+          distractors.add(w);
+        }
+      }
+
+      final options = [correctWordClean, ...distractors]..shuffle();
+
+      generated.add(_ChunkQuestion(
+        question: 'Select the missing word:\n"$questionText"',
+        options: options,
+        correctAnswer: correctWordClean,
+      ));
+      
+      if (generated.length >= 3) break;
+    }
+
+    if (generated.isEmpty) {
+      generated.add(const _ChunkQuestion(
+        question: "Did you understand the text?",
+        options: ["Yes, fully", "Mostly", "A little", "No"],
+        correctAnswer: "Yes, fully",
+      ));
+    }
+
+    return generated;
   }
 
   void _startNewGame() {
@@ -193,6 +430,19 @@ class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
   void _finishGame() {
     _chunkTimer?.cancel();
     _globalTimer?.cancel();
+
+    // Save progress to book database if applicable
+    final isBook = _selectedArticleIndex >= _articles.length;
+    if (isBook) {
+      final books = ref.read(booksProvider);
+      final bookIndex = _selectedArticleIndex - _articles.length;
+      if (bookIndex >= 0 && bookIndex < books.length) {
+        final book = books[bookIndex];
+        final newIndex = book.currentWordIndex + _actualWordsRead;
+        ref.read(booksProvider.notifier).updateProgress(book.id, newIndex);
+      }
+    }
+
     setState(() {
       _isFinished = true;
     });
@@ -248,6 +498,18 @@ class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
                   _introGoalCard(),
                   const SizedBox(height: 24),
                   const Text(
+                    'SELECT TEXT ARTICLE',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _articleSelector(),
+                  const SizedBox(height: 24),
+                  const Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
@@ -276,6 +538,73 @@ class ChunkReadingRuntimeScreenState extends State<ChunkReadingRuntimeScreen> {
           ),
           _introActions(),
         ],
+      ),
+    );
+  }
+
+  Widget _articleSelector() {
+    final books = ref.watch(booksProvider);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: T.surfaceLowest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: T.border, width: 0.8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: _selectedArticleIndex,
+          icon: const Icon(Icons.arrow_drop_down, color: T.textSecondary),
+          isExpanded: true,
+          dropdownColor: T.surfaceLowest,
+          items: [
+            ...List.generate(_articles.length, (index) {
+              return DropdownMenuItem<int>(
+                value: index,
+                child: Text(
+                  _articles[index].title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: T.textPrimary,
+                  ),
+                ),
+              );
+            }),
+            ...List.generate(books.length, (index) {
+              final book = books[index];
+              return DropdownMenuItem<int>(
+                value: _articles.length + index,
+                child: Text(
+                  'Book: ${book.title}',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: T.primary,
+                  ),
+                ),
+              );
+            }),
+          ],
+          onChanged: (val) async {
+            if (val != null) {
+              setState(() {
+                _selectedArticleIndex = val;
+              });
+              if (val >= _articles.length) {
+                final book = books[val - _articles.length];
+                await _loadBookContent(book);
+              } else {
+                setState(() {
+                  _loadedBookText = null;
+                  _dynamicQuestions = null;
+                  _buildChunks();
+                });
+              }
+            }
+          },
+        ),
       ),
     );
   }

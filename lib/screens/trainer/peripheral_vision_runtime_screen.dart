@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'trainer_tokens.dart';
+import '../../services/distractor_generator.dart';
 
 class _PeripheralRound {
   final String target;
@@ -49,6 +50,26 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
     ['flame', 'frame', 'shame', 'blame'],
     ['beach', 'bench', 'reach', 'peach'],
     ['smart', 'start', 'shirt', 'smash'],
+    ['plant', 'plane', 'paint', 'point'],
+    ['sound', 'round', 'bound', 'pound'],
+    ['shore', 'share', 'score', 'chore'],
+    ['sleep', 'sheep', 'steep', 'sweep'],
+    ['cream', 'dream', 'scream', 'steam'],
+    ['track', 'trick', 'truck', 'trace'],
+    ['pride', 'price', 'prize', 'prime'],
+    ['watch', 'match', 'catch', 'patch'],
+    ['bread', 'break', 'broad', 'beard'],
+    ['glass', 'grass', 'gloss', 'class'],
+    ['force', 'forge', 'farce', 'focus'],
+    ['smoke', 'smile', 'smell', 'smart'],
+    ['fruit', 'fluid', 'flute', 'front'],
+    ['spoke', 'spine', 'space', 'spare'],
+    ['black', 'block', 'blank', 'blink'],
+    ['climb', 'claim', 'clear', 'clean'],
+    ['stage', 'stare', 'share', 'stave'],
+    ['place', 'plate', 'plane', 'phase'],
+    ['count', 'court', 'coast', 'craft'],
+    ['proud', 'prove', 'proof', 'group'],
   ];
 
   late List<_PeripheralRound> _rounds;
@@ -102,23 +123,21 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
 
   void _generateRounds() {
     final rand = Random();
-    // Copy and shuffle word pool
-    final pool = [..._wordPool]..shuffle();
+    final Set<String> targets = {};
+    while (targets.length < _totalRounds) {
+      targets.add(DistractorGenerator.getRandomWord());
+    }
 
-    _rounds = List.generate(_totalRounds, (index) {
-      final item = pool[index % pool.length];
-      final target = item[0];
-      // Shuffle options for multiple choice
-      final options = [...item]..shuffle();
-      // Choose a random peripheral position angle index (0 to 7)
+    _rounds = targets.map((target) {
+      final distractors = DistractorGenerator.generateLookalikes(target, 3);
+      final options = [target, ...distractors]..shuffle();
       final angleIdx = rand.nextInt(8);
-
       return _PeripheralRound(
         target: target,
         options: options,
         angleIndex: angleIdx,
       );
-    });
+    }).toList();
   }
 
   void _startGlobalTimer() {

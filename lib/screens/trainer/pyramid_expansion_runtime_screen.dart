@@ -96,6 +96,116 @@ class PyramidExpansionRuntimeScreenState extends State<PyramidExpansionRuntimeSc
       targetWord: 'predator',
       verificationOptions: ['predator', 'prey', 'keeper', 'forest'],
     ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('kind', 'soul'),
+        _PyramidLine('happy', 'smile'),
+        _PyramidLine('loving', 'family'),
+        _PyramidLine('caring', 'friends'),
+        _PyramidLine('peaceful', 'relation'),
+      ],
+      targetWord: 'loving',
+      verificationOptions: ['loving', 'hostile', 'lonely', 'angry'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('tall', 'tree'),
+        _PyramidLine('thick', 'trunk'),
+        _PyramidLine('golden', 'leaves'),
+        _PyramidLine('autumn', 'weather'),
+        _PyramidLine('blowing', 'branches'),
+      ],
+      targetWord: 'autumn',
+      verificationOptions: ['autumn', 'spring', 'summer', 'winter'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('dark', 'cave'),
+        _PyramidLine('black', 'rocks'),
+        _PyramidLine('secret', 'pathway'),
+        _PyramidLine('hidden', 'treasures'),
+        _PyramidLine('glowing', 'diamonds'),
+      ],
+      targetWord: 'treasures',
+      verificationOptions: ['treasures', 'rubbish', 'pebbles', 'shadows'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('soft', 'wool'),
+        _PyramidLine('fluffy', 'pillow'),
+        _PyramidLine('cozy', 'blankets'),
+        _PyramidLine('warm', 'fireplace'),
+        _PyramidLine('winter', 'comforts'),
+      ],
+      targetWord: 'fireplace',
+      verificationOptions: ['fireplace', 'snowball', 'icicle', 'frostbite'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('loud', 'bell'),
+        _PyramidLine('noisy', 'street'),
+        _PyramidLine('crowded', 'markets'),
+        _PyramidLine('traffic', 'congestion'),
+        _PyramidLine('endless', 'commotion'),
+      ],
+      targetWord: 'congestion',
+      verificationOptions: ['congestion', 'clearance', 'emptiness', 'freedom'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('rare', 'gem'),
+        _PyramidLine('shiny', 'pearl'),
+        _PyramidLine('costly', 'jewelry'),
+        _PyramidLine('antique', 'collection'),
+        _PyramidLine('valuable', 'possession'),
+      ],
+      targetWord: 'possession',
+      verificationOptions: ['possession', 'donation', 'loss', 'theft'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('high', 'peak'),
+        _PyramidLine('steep', 'climb'),
+        _PyramidLine('rocky', 'terrain'),
+        _PyramidLine('snowy', 'glacier'),
+        _PyramidLine('windy', 'summit'),
+      ],
+      targetWord: 'glacier',
+      verificationOptions: ['glacier', 'desert', 'forest', 'swamp'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('blue', 'lake'),
+        _PyramidLine('clear', 'water'),
+        _PyramidLine('swimming', 'fishes'),
+        _PyramidLine('floating', 'lilies'),
+        _PyramidLine('relaxing', 'vacation'),
+      ],
+      targetWord: 'swimming',
+      verificationOptions: ['swimming', 'sinking', 'flying', 'climbing'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('hard', 'work'),
+        _PyramidLine('heavy', 'loads'),
+        _PyramidLine('strong', 'efforts'),
+        _PyramidLine('endless', 'patience'),
+        _PyramidLine('deserved', 'success'),
+      ],
+      targetWord: 'patience',
+      verificationOptions: ['patience', 'laziness', 'anger', 'haste'],
+    ),
+    _PyramidRound(
+      lines: [
+        _PyramidLine('old', 'town'),
+        _PyramidLine('stone', 'walls'),
+        _PyramidLine('ancient', 'castles'),
+        _PyramidLine('historic', 'monuments'),
+        _PyramidLine('beautiful', 'cathedrals'),
+      ],
+      targetWord: 'monuments',
+      verificationOptions: ['monuments', 'skyscrapers', 'factories', 'highways'],
+    ),
   ];
 
   late List<_PyramidRound> _rounds;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'trainer_tokens.dart';
+import '../../services/distractor_generator.dart';
 
 class _FlashRound {
   final String target;
@@ -46,6 +47,26 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
     ['fast car', 'fast cat', 'last car', 'last cat'],
     ['hot tea', 'hot sea', 'not tea', 'not sea'],
     ['deep ocean', 'deep onion', 'dear ocean', 'dear onion'],
+    ['running fast', 'running last', 'jumping fast', 'jumping last'],
+    ['white bird', 'white beard', 'write bird', 'write beard'],
+    ['clean water', 'clear water', 'clean waiter', 'clear waiter'],
+    ['heavy rain', 'heavy train', 'happy rain', 'happy train'],
+    ['bright star', 'bright start', 'right star', 'right start'],
+    ['young child', 'young shield', 'your child', 'your shield'],
+    ['sweet peach', 'sweet beach', 'sweat peach', 'sweat beach'],
+    ['high hill', 'high hall', 'sigh hill', 'sigh hall'],
+    ['wild horse', 'wild house', 'mild horse', 'mild house'],
+    ['dark night', 'dark knight', 'bark night', 'bark knight'],
+    ['soft bed', 'soft bad', 'sort bed', 'sort bad'],
+    ['cold wind', 'cold wine', 'bold wind', 'bold wine'],
+    ['loud voice', 'loud vice', 'load voice', 'load vice'],
+    ['fresh bread', 'fresh broad', 'flesh bread', 'flesh broad'],
+    ['small town', 'small down', 'smart town', 'smart down'],
+    ['poor man', 'poor map', 'pour man', 'pour map'],
+    ['rich king', 'rich ring', 'rice king', 'rice ring'],
+    ['old book', 'old boot', 'odd book', 'odd boot'],
+    ['new desk', 'new disk', 'now desk', 'now disk'],
+    ['big city', 'big pity', 'bag city', 'bag pity'],
   ];
 
   late List<_FlashRound> _rounds;
@@ -102,19 +123,16 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
   }
 
   void _generateRounds() {
-    // Copy and shuffle phrase pool
-    final pool = [..._phrasePool]..shuffle();
+    final Set<String> targets = {};
+    while (targets.length < _totalRounds) {
+      targets.add(DistractorGenerator.getRandomPhrase());
+    }
 
-    _rounds = List.generate(_totalRounds, (index) {
-      final item = pool[index % pool.length];
-      final target = item[0];
-      final options = [...item]..shuffle();
-
-      return _FlashRound(
-        target: target,
-        options: options,
-      );
-    });
+    _rounds = targets.map((target) {
+      final distractors = DistractorGenerator.generatePhraseLookalikes(target, 3);
+      final options = [target, ...distractors]..shuffle();
+      return _FlashRound(target: target, options: options);
+    }).toList();
   }
 
   void _startGlobalTimer() {

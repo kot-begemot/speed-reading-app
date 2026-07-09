@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'trainer_tokens.dart';
+import '../../services/distractor_generator.dart';
 
 class _WordMatchRound {
   final String target;
@@ -39,6 +40,26 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
     ['stone', 'store', 'shine', 'alone', 'clone', 'shone', 'stole', 'stoneys', 'spine', 'snout', 'stove', 'stage'],
     ['flame', 'frame', 'shame', 'blame', 'flare', 'fame', 'flake', 'flume', 'flash', 'flesh', 'flush', 'claim'],
     ['smart', 'start', 'shirt', 'smash', 'small', 'smelt', 'smile', 'smoke', 'smarted', 'spark', 'shark', 'spart'],
+    ['plant', 'plane', 'paint', 'point', 'plank', 'planet', 'plants', 'pliant', 'pant', 'print', 'pointy', 'pants'],
+    ['sound', 'round', 'bound', 'pound', 'hound', 'found', 'wound', 'sooth', 'sounds', 'south', 'solid', 'sonar'],
+    ['shore', 'share', 'score', 'chore', 'store', 'snore', 'shone', 'shape', 'sharp', 'shirk', 'shirt', 'sheer'],
+    ['sleep', 'sheep', 'steep', 'sweep', 'sleek', 'sleepy', 'slips', 'speed', 'sleet', 'weep', 'slope', 'slump'],
+    ['cream', 'dream', 'scream', 'steam', 'creed', 'creak', 'crime', 'crept', 'crams', 'crown', 'crane', 'clear'],
+    ['track', 'trick', 'truck', 'trace', 'tracks', 'tread', 'trade', 'tracky', 'tack', 'brick', 'tuck', 'trunk'],
+    ['pride', 'price', 'prize', 'prime', 'bride', 'prude', 'probe', 'prove', 'prior', 'print', 'prism', 'prick'],
+    ['watch', 'match', 'catch', 'patch', 'batch', 'witch', 'water', 'waste', 'watts', 'wrath', 'hatch', 'latch'],
+    ['bread', 'break', 'broad', 'beard', 'beads', 'breed', 'brand', 'bribe', 'bleak', 'broom', 'brook', 'board'],
+    ['glass', 'grass', 'gloss', 'class', 'glare', 'glands', 'glassy', 'grace', 'gross', 'shining', 'clash', 'flask'],
+    ['force', 'forge', 'farce', 'focus', 'forte', 'fores', 'forced', 'horse', 'sauce', 'faced', 'fence', 'first'],
+    ['smoke', 'smile', 'smell', 'smart', 'smokehouse', 'smock', 'smoky', 'smirk', 'spoke', 'stoke', 'shake', 'snake'],
+    ['fruit', 'fluid', 'flute', 'front', 'fraud', 'frost', 'frown', 'fruity', 'frail', 'frame', 'flume', 'fluteplayer'],
+    ['spoke', 'spine', 'space', 'spare', 'spoke-wheel', 'spike', 'spoil', 'spoon', 'spire', 'spore', 'spent', 'sport'],
+    ['black', 'block', 'blank', 'blink', 'blackboard', 'slack', 'clack', 'shack', 'blacky', 'blade', 'bland', 'blend'],
+    ['climb', 'claim', 'clear', 'clean', 'climber', 'clink', 'cling', 'cliff', 'cloak', 'close', 'cloth', 'clone'],
+    ['stage', 'stare', 'share', 'stave', 'stagedoor', 'stale', 'state', 'stagey', 'staves', 'shave', 'store', 'stone'],
+    ['place', 'plate', 'plane', 'phase', 'placement', 'plaza', 'plays', 'plaid', 'palace', 'please', 'peace', 'pace'],
+    ['count', 'court', 'coast', 'craft', 'counter', 'mount', 'county', 'coins', 'cents', 'costs', 'casts', 'cleft'],
+    ['proud', 'prove', 'proof', 'group', 'proudly', 'prowl', 'prude', 'prime', 'prior', 'prize', 'price', 'pound'],
   ];
 
   late List<_WordMatchRound> _rounds;
@@ -91,14 +112,15 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
   }
 
   void _generateRounds() {
-    // Generate 10 rounds from the word groups
     _rounds = [];
-    final pool = [..._wordGroups]..shuffle();
-    for (int i = 0; i < _totalRounds; i++) {
-      final group = pool[i];
-      final target = group[0];
-      // Shuffle the list of 12 options
-      final options = [...group]..shuffle();
+    final Set<String> targets = {};
+    while (targets.length < _totalRounds) {
+      targets.add(DistractorGenerator.getRandomWord());
+    }
+
+    for (final target in targets) {
+      final distractors = DistractorGenerator.generateLookalikes(target, 11);
+      final options = [target, ...distractors]..shuffle();
       _rounds.add(_WordMatchRound(target: target, options: options));
     }
   }
