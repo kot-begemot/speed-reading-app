@@ -118,27 +118,28 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = T.of(context);
     final state = ref.watch(trainingProgramProvider);
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Training Program',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -147,14 +148,14 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _goalCard(state),
+            _goalCard(state, t),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'This session',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: T.textPrimary,
+                color: t.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -214,14 +215,14 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
     return _StepState.locked;
   }
 
-  Widget _goalCard(TrainingProgramState state) {
+  Widget _goalCard(TrainingProgramState state, TTheme t) {
     final progress = state.consecutiveSuccessfulSessions;
     final total = state.sessionsRequiredForPromotion;
     final minComprehension = state.level <= 2 ? 70 : (state.level <= 4 ? 65 : 60);
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
+      decoration: t.card(radius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -244,10 +245,10 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     'Goal: ${state.targetWpm} WPM · ≥$minComprehension%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                 ],
@@ -272,7 +273,7 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
                   child: Container(
                     height: 6,
                     decoration: BoxDecoration(
-                      color: isFilled ? T.success : T.borderStrong.withValues(alpha: 0.5),
+                      color: isFilled ? T.success : t.borderStrong.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -283,7 +284,7 @@ class TrainingProgramPlanScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             '${total - progress} more qualified session${(total - progress) > 1 ? 's' : ''} to reach Level ${state.level + 1}',
-            style: const TextStyle(fontSize: 12, color: T.textSecondary, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 12, color: t.textSecondary, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -336,26 +337,28 @@ class _Step extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
+
     final Color circleColor = switch (state) {
       _StepState.done => T.success,
       _StepState.current => T.primary,
-      _StepState.locked => T.surfaceLow,
+      _StepState.locked => t.surfaceLow,
     };
     final Color iconColor =
-        state == _StepState.locked ? T.textSecondary : Colors.white;
+        state == _StepState.locked ? t.textSecondary : Colors.white;
     final Color kickerColor = switch (state) {
       _StepState.current => T.primary,
-      _StepState.locked => T.textSecondary,
-      _StepState.done => T.textSecondary,
+      _StepState.locked => t.textSecondary,
+      _StepState.done => t.textSecondary,
     };
 
     final BoxDecoration decoration = state == _StepState.current
         ? BoxDecoration(
-            color: T.primaryBg,
+            color: t.primaryBg,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: T.primary, width: 1.2),
           )
-        : T.card(radius: 14);
+        : t.card(radius: 14);
 
     final card = Container(
       padding: const EdgeInsets.all(14),
@@ -390,10 +393,10 @@ class _Step extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],

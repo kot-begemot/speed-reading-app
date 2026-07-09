@@ -9,6 +9,8 @@ import '../models/book_meta.dart';
 import '../models/trainer_profile.dart';
 import '../models/training_content.dart';
 import '../models/training_session.dart';
+import '../utils/book_start_hunter.dart';
+import '../utils/word_tokenizer.dart';
 
 /// Owns book persistence: a Hive box of [BookMeta] (metadata only) plus the
 /// on-disk `books/` directory that holds each book's extracted text and cover.
@@ -155,7 +157,16 @@ class StorageService {
     await _box.put(id, meta);
   }
 
-  Future<void> resetProgress(String id) => updateProgress(id, 0);
+  Future<void> resetProgress(String id) async {
+    try {
+      final text = await readBookText(id);
+      final tokenized = WordTokenizer.tokenize(text);
+      final startIndex = BookStartHunter.findContentStartIndex(tokenized);
+      await updateProgress(id, startIndex);
+    } catch (_) {
+      await updateProgress(id, 0);
+    }
+  }
 
   /// Removes the metadata record AND its text/cover files.
   Future<void> removeBook(String id) async {

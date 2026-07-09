@@ -23,14 +23,15 @@ class TrainerHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = T.of(context);
     final langCode = ref.watch(activeTrainerLanguageProvider);
     final profileAsync = ref.watch(trainerProfileProvider);
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: profileAsync.when(
-          loading: () => const Center(child: Text('Loading...', style: TextStyle(color: T.textSecondary))),
+          loading: () => Center(child: Text('Loading...', style: TextStyle(color: t.textSecondary))),
           error: (err, stack) => Center(
             child: Text(
               'Error loading profile: $err',
@@ -42,10 +43,10 @@ class TrainerHomeScreen extends ConsumerWidget {
             final hasBaseline = langProfile?.baselineCompletedAt != null;
 
             if (!hasBaseline) {
-              return _buildBaselineRequiredView(context, ref, langCode);
+              return _buildBaselineRequiredView(context, ref, langCode, t);
             }
 
-            return _buildDashboardView(context, ref, langCode, profile, langProfile!);
+            return _buildDashboardView(context, ref, langCode, profile, langProfile!, t);
           },
         ),
       ),
@@ -55,43 +56,43 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Top bar with language selector
   // ---------------------------------------------------------------------------
-  Widget _topBar(BuildContext context, WidgetRef ref, String langCode) {
+  Widget _topBar(BuildContext context, WidgetRef ref, String langCode, TTheme t) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Trainer',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
             letterSpacing: -0.5,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
         GestureDetector(
-          onTap: () => _showLanguagePicker(context, ref, langCode),
+          onTap: () => _showLanguagePicker(context, ref, langCode, t),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
             decoration: BoxDecoration(
-              color: T.surfaceLowest,
+              color: t.surfaceLowest,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: T.border, width: 0.8),
+              border: Border.all(color: t.border, width: 0.8),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.language, size: 16, color: T.textSecondary),
+                Icon(Icons.language, size: 16, color: t.textSecondary),
                 const SizedBox(width: 6),
                 Text(
                   langCode == 'en' ? 'English' : 'Русский',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(width: 2),
-                const Icon(Icons.keyboard_arrow_down, size: 18, color: T.textSecondary),
+                Icon(Icons.keyboard_arrow_down, size: 18, color: t.textSecondary),
               ],
             ),
           ),
@@ -100,10 +101,10 @@ class TrainerHomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguagePicker(BuildContext context, WidgetRef ref, String currentLang) {
+  void _showLanguagePicker(BuildContext context, WidgetRef ref, String currentLang, TTheme t) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -113,18 +114,18 @@ class TrainerHomeScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Choose Language',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               ListTile(
                 leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
-                title: const Text('English', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text('English', style: TextStyle(fontWeight: FontWeight.w600, color: t.textPrimary)),
                 trailing: currentLang == 'en'
                     ? const Icon(Icons.check_circle_rounded, color: T.primary)
                     : null,
@@ -135,7 +136,7 @@ class TrainerHomeScreen extends ConsumerWidget {
               ),
               ListTile(
                 leading: const Text('🇷🇺', style: TextStyle(fontSize: 24)),
-                title: const Text('Русский (Russian)', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text('Русский (Russian)', style: TextStyle(fontWeight: FontWeight.w600, color: t.textPrimary)),
                 trailing: currentLang == 'ru'
                     ? const Icon(Icons.check_circle_rounded, color: T.primary)
                     : null,
@@ -155,12 +156,12 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Locked Baseline View
   // ---------------------------------------------------------------------------
-  Widget _buildBaselineRequiredView(BuildContext context, WidgetRef ref, String langCode) {
+  Widget _buildBaselineRequiredView(BuildContext context, WidgetRef ref, String langCode, TTheme t) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          _topBar(context, ref, langCode),
+          _topBar(context, ref, langCode, t),
           const Spacer(),
           Center(
             child: Container(
@@ -178,13 +179,13 @@ class TrainerHomeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Diagnostic Required',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -192,10 +193,10 @@ class TrainerHomeScreen extends ConsumerWidget {
             'Please complete the baseline assessment for ${langCode == 'en' ? 'English' : 'Russian'} '
             'to unlock the training program and skill drills.',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
           const Spacer(),
@@ -244,6 +245,7 @@ class TrainerHomeScreen extends ConsumerWidget {
     String langCode,
     TrainerProfile profile,
     TrainerLanguageProfile langProfile,
+    TTheme t,
   ) {
     final recentSessionsAsync = ref.watch(recentSessionsProvider(langCode));
 
@@ -251,22 +253,22 @@ class TrainerHomeScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       physics: const BouncingScrollPhysics(),
       children: [
-        _topBar(context, ref, langCode),
+        _topBar(context, ref, langCode, t),
         const SizedBox(height: 16),
         _levelCard(langProfile),
         const SizedBox(height: 16),
-        _modeRow(context),
+        _modeRow(context, t),
         const SizedBox(height: 16),
-        _sectionHeader('Quick drills', 'See all', () {
+        _sectionHeader('Quick drills', 'See all', t, () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const SkillTrainingScreen()),
           );
         }),
         const SizedBox(height: 12),
-        _quickDrills(context, ref, langCode),
+        _quickDrills(context, ref, langCode, t),
         const SizedBox(height: 16),
-        _sectionHeader('Recent sessions', 'History', () {
+        _sectionHeader('Recent sessions', 'History', t, () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SessionHistoryScreen(lang: langCode)),
@@ -277,10 +279,10 @@ class TrainerHomeScreen extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator(color: T.primary)),
           error: (err, stack) => Container(
             padding: const EdgeInsets.all(16),
-            decoration: T.card(),
+            decoration: t.card(),
             child: Text('Error loading history: $err'),
           ),
-          data: (sessions) => _buildRecentSessionsList(sessions),
+          data: (sessions) => _buildRecentSessionsList(sessions, t),
         ),
       ],
     );
@@ -479,7 +481,7 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Mode row (Training Program / Skill Training)
   // ---------------------------------------------------------------------------
-  Widget _modeRow(BuildContext context) {
+  Widget _modeRow(BuildContext context, TTheme t) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -542,24 +544,24 @@ class TrainerHomeScreen extends ConsumerWidget {
               },
               child: Container(
                 padding: const EdgeInsets.all(16),
-                decoration: T.card(),
-                child: const Column(
+                decoration: t.card(),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.fitness_center, size: 26, color: T.accentTeal),
-                    SizedBox(height: 12),
+                    const Icon(Icons.fitness_center, size: 26, color: T.accentTeal),
+                    const SizedBox(height: 12),
                     Text(
                       'Skill Training',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: T.textPrimary,
+                        color: t.textPrimary,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Free drills for single skills',
-                      style: TextStyle(fontSize: 11, color: T.textSecondary),
+                      style: TextStyle(fontSize: 11, color: t.textSecondary),
                     ),
                   ],
                 ),
@@ -574,16 +576,16 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Section header
   // ---------------------------------------------------------------------------
-  Widget _sectionHeader(String title, String action, VoidCallback onTap) {
+  Widget _sectionHeader(String title, String action, TTheme t, VoidCallback onTap) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
         GestureDetector(
@@ -604,7 +606,7 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Quick drills grid
   // ---------------------------------------------------------------------------
-  Widget _quickDrills(BuildContext context, WidgetRef ref, String langCode) {
+  Widget _quickDrills(BuildContext context, WidgetRef ref, String langCode, TTheme t) {
     void Function(int, int, int) onCompleteFor(String exerciseType) {
       return (accuracy, errors, durationSecs) {
         logDrillResult(
@@ -643,7 +645,7 @@ class TrainerHomeScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: _drillCard(Icons.grid_view, T.accentViolet, 'Schulte Table', schulteSub),
+                  child: _drillCard(Icons.grid_view, T.accentViolet, 'Schulte Table', schulteSub, t),
                 ),
               ),
               const SizedBox(width: 10),
@@ -658,7 +660,7 @@ class TrainerHomeScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: _drillCard(Icons.location_on, T.accentTeal, 'Number Tracking', 'Find & follow digits'),
+                  child: _drillCard(Icons.location_on, T.accentTeal, 'Number Tracking', 'Find & follow digits', t),
                 ),
               ),
             ],
@@ -680,7 +682,7 @@ class TrainerHomeScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: _drillCard(Icons.visibility, T.warning, 'Peripheral Vision', 'Recognize at the edges'),
+                  child: _drillCard(Icons.visibility, T.warning, 'Peripheral Vision', 'Recognize at the edges', t),
                 ),
               ),
               const SizedBox(width: 10),
@@ -695,7 +697,7 @@ class TrainerHomeScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: _drillCard(Icons.bolt, T.primary, 'Flash Recognition', '300ms · 3-word phrases'),
+                  child: _drillCard(Icons.bolt, T.primary, 'Flash Recognition', '300ms · 3-word phrases', t),
                 ),
               ),
             ],
@@ -705,10 +707,10 @@ class TrainerHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _drillCard(IconData icon, Color accent, String title, String sub) {
+  Widget _drillCard(IconData icon, Color accent, String title, String sub, TTheme t) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: T.card(radius: 14),
+      decoration: t.card(radius: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -725,16 +727,16 @@ class TrainerHomeScreen extends ConsumerWidget {
           const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             sub,
-            style: const TextStyle(fontSize: 11, color: T.textSecondary),
+            style: TextStyle(fontSize: 11, color: t.textSecondary),
           ),
         ],
       ),
@@ -744,24 +746,24 @@ class TrainerHomeScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Recent sessions from database box
   // ---------------------------------------------------------------------------
-  Widget _buildRecentSessionsList(List<TrainingSession> sessions) {
+  Widget _buildRecentSessionsList(List<TrainingSession> sessions, TTheme t) {
     if (sessions.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         alignment: Alignment.center,
-        decoration: T.card(),
-        child: const Column(
+        decoration: t.card(),
+        child: Column(
           children: [
-            Icon(Icons.history, color: T.textSecondary, size: 36),
-            SizedBox(height: 10),
+            Icon(Icons.history, color: t.textSecondary, size: 36),
+            const SizedBox(height: 10),
             Text(
               'No training sessions yet',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: T.textPrimary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: t.textPrimary),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               'Complete program steps to see logs here.',
-              style: TextStyle(fontSize: 12, color: T.textSecondary),
+              style: TextStyle(fontSize: 12, color: t.textSecondary),
             ),
           ],
         ),
@@ -769,13 +771,13 @@ class TrainerHomeScreen extends ConsumerWidget {
     }
 
     return Container(
-      decoration: T.card(),
+      decoration: t.card(),
       clipBehavior: Clip.antiAlias,
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: sessions.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, thickness: 1, color: T.border),
+        separatorBuilder: (context, index) => Divider(height: 1, thickness: 1, color: t.border),
         itemBuilder: (context, index) {
           final session = sessions[index];
           final isQualified = session.qualified;
@@ -790,20 +792,20 @@ class TrainerHomeScreen extends ConsumerWidget {
           if (isFailed) {
             icon = Icons.close;
             statusColor = T.error;
-            badgeBg = T.dangerBg;
+            badgeBg = t.dangerBg;
             badgeText = T.error;
             badge = 'FAILED';
           } else if (isQualified) {
             icon = Icons.check;
             statusColor = T.success;
-            badgeBg = T.successBg;
+            badgeBg = t.successBg;
             badgeText = T.success;
             badge = 'QUALIFIED';
           } else {
             icon = Icons.fitness_center_rounded;
             statusColor = T.primary;
-            badgeBg = T.surfaceLow;
-            badgeText = T.textSecondary;
+            badgeBg = t.surfaceLow;
+            badgeText = t.textSecondary;
             badge = 'PRACTICE';
           }
 
@@ -839,7 +841,7 @@ class TrainerHomeScreen extends ConsumerWidget {
             }
           }
 
-          return _sessionRow(icon, statusColor, badgeBg, badge, badgeText, displayTitle, displayMeta);
+          return _sessionRow(icon, statusColor, badgeBg, badge, badgeText, displayTitle, displayMeta, t);
         },
       ),
     );
@@ -853,6 +855,7 @@ class TrainerHomeScreen extends ConsumerWidget {
     Color badgeText,
     String title,
     String meta,
+    TTheme t,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
@@ -875,18 +878,18 @@ class TrainerHomeScreen extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   meta,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: T.textSecondary,
+                    color: t.textSecondary,
                   ),
                 ),
               ],

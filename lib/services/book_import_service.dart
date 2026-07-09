@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import '../models/book_meta.dart';
+import '../utils/book_start_hunter.dart';
 import '../utils/word_tokenizer.dart';
 import 'storage_service.dart';
 import 'text_parser_service.dart';
@@ -52,10 +53,13 @@ class BookImportService {
       return const ImportResult(ImportStatus.noText);
     }
 
-    final totalWords = WordTokenizer.tokenize(text).wordCount;
+    final tokenized = WordTokenizer.tokenize(text);
+    final totalWords = tokenized.wordCount;
     if (totalWords == 0) {
       return const ImportResult(ImportStatus.noText);
     }
+
+    final startIndex = BookStartHunter.findContentStartIndex(tokenized);
 
     final title = _nonEmpty(parsed.title) ?? _titleFromFile(file.path);
     final author = _nonEmpty(parsed.author) ?? 'Unknown';
@@ -102,6 +106,7 @@ class BookImportService {
       totalWords: totalWords,
       addedAt: now,
       lastOpenedAt: now,
+      currentWordIndex: startIndex,
       coverImagePath: coverImagePath,
     );
     await storage.addBook(meta, text);
@@ -155,8 +160,11 @@ class BookImportService {
     text = TextParserService.sanitizeText(text);
     if (text.isEmpty) return const ImportResult(ImportStatus.noText);
 
-    final totalWords = WordTokenizer.tokenize(text).wordCount;
+    final tokenized = WordTokenizer.tokenize(text);
+    final totalWords = tokenized.wordCount;
     if (totalWords == 0) return const ImportResult(ImportStatus.noText);
+
+    final startIndex = BookStartHunter.findContentStartIndex(tokenized);
 
     final finalTitle = _nonEmpty(title) ?? _titleFromUrl(uri);
     final isDuplicate = existing.any((b) =>
@@ -177,6 +185,7 @@ class BookImportService {
       totalWords: totalWords,
       addedAt: now,
       lastOpenedAt: now,
+      currentWordIndex: startIndex,
     );
     await storage.addBook(meta, text);
     return ImportResult(ImportStatus.success, book: meta);
@@ -188,8 +197,11 @@ class BookImportService {
     final text = TextParserService.sanitizeText(rawText);
     if (text.isEmpty) return const ImportResult(ImportStatus.noText);
 
-    final totalWords = WordTokenizer.tokenize(text).wordCount;
+    final tokenized = WordTokenizer.tokenize(text);
+    final totalWords = tokenized.wordCount;
     if (totalWords == 0) return const ImportResult(ImportStatus.noText);
+
+    final startIndex = BookStartHunter.findContentStartIndex(tokenized);
 
     final title = _titleFromText(text);
     final isDuplicate = existing.any((b) =>
@@ -209,6 +221,7 @@ class BookImportService {
       totalWords: totalWords,
       addedAt: now,
       lastOpenedAt: now,
+      currentWordIndex: startIndex,
     );
     await storage.addBook(meta, text);
     return ImportResult(ImportStatus.success, book: meta);

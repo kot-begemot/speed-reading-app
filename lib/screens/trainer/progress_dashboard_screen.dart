@@ -41,6 +41,7 @@ class _ProgressDashboardScreenState extends ConsumerState<ProgressDashboardScree
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final lang = ref.watch(activeTrainerLanguageProvider);
     final period = ref.watch(activePeriodProvider);
     final statsKey = (lang: lang, period: period);
@@ -54,7 +55,7 @@ class _ProgressDashboardScreenState extends ConsumerState<ProgressDashboardScree
     });
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -101,19 +102,20 @@ class _Header extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = T.of(context);
     final langLabel = lang == 'en' ? 'English' : lang == 'ru' ? 'Russian' : lang.toUpperCase();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Progress',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           GestureDetector(
@@ -125,21 +127,21 @@ class _Header extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
               decoration: BoxDecoration(
-                color: T.surfaceLowest,
+                color: t.surfaceLowest,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: T.border, width: 0.8),
+                border: Border.all(color: t.border, width: 0.8),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.language, size: 16, color: T.textSecondary),
+                  Icon(Icons.language, size: 16, color: t.textSecondary),
                   const SizedBox(width: 6),
                   Text(
                     langLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                 ],
@@ -162,18 +164,19 @@ class _PeriodSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = T.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: T.surfaceLowest,
+        color: t.surfaceLowest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: T.border, width: 0.8),
+        border: Border.all(color: t.border, width: 0.8),
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
         children: [
           for (int i = 0; i < StatsPeriod.values.length; i++) ...[
             if (i > 0)
-              Container(width: 0.8, height: 38, color: T.border),
+              Container(width: 0.8, height: 38, color: t.border),
             Expanded(
               child: GestureDetector(
                 onTap: () => ref.read(activePeriodProvider.notifier).select(StatsPeriod.values[i]),
@@ -197,6 +200,7 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: 38,
@@ -207,7 +211,7 @@ class _Segment extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          color: selected ? T.primary : T.textSecondary,
+          color: selected ? T.primary : t.textSecondary,
         ),
       ),
     );
@@ -228,11 +232,6 @@ class _StatsGrid extends StatelessWidget {
     return '$delta';
   }
 
-  Color _deltaColor(int? delta) {
-    if (delta == null || delta == 0) return T.textSecondary;
-    return delta > 0 ? T.success : T.error;
-  }
-
   IconData _deltaIcon(int? delta) {
     if (delta == null || delta == 0) return Icons.remove;
     return delta > 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded;
@@ -240,6 +239,14 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
+    final secondaryColor = t.textSecondary;
+
+    Color deltaColorWithSecondary(int? delta) {
+      if (delta == null || delta == 0) return secondaryColor;
+      return delta > 0 ? T.success : T.error;
+    }
+
     return Column(
       children: [
         Row(
@@ -252,7 +259,7 @@ class _StatsGrid extends StatelessWidget {
                 delta: stats.wpmDelta != null && stats.wpmDelta != 0
                     ? _fmtDelta(stats.wpmDelta)
                     : null,
-                deltaColor: _deltaColor(stats.wpmDelta),
+                deltaColor: deltaColorWithSecondary(stats.wpmDelta),
                 deltaIcon: _deltaIcon(stats.wpmDelta),
               ),
             ),
@@ -280,7 +287,7 @@ class _StatsGrid extends StatelessWidget {
                 delta: stats.comprDelta != null && stats.comprDelta != 0
                     ? _fmtDelta(stats.comprDelta)
                     : null,
-                deltaColor: _deltaColor(stats.comprDelta),
+                deltaColor: deltaColorWithSecondary(stats.comprDelta),
                 deltaIcon: _deltaIcon(stats.comprDelta),
               ),
             ),
@@ -312,9 +319,10 @@ class _StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(),
+      decoration: t.card(),
       child: Row(
         children: [
           // Current streak
@@ -322,9 +330,9 @@ class _StreakCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'CURRENT STREAK',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4, color: T.textSecondary),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4, color: t.textSecondary),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -332,14 +340,14 @@ class _StreakCard extends StatelessWidget {
                   children: [
                     Text(
                       '${stats.currentStreak}',
-                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1, color: T.textPrimary),
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1, color: t.textPrimary),
                     ),
                     const SizedBox(width: 6),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 5),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
                       child: Text(
                         'in a row',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: T.textSecondary),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: t.textSecondary),
                       ),
                     ),
                   ],
@@ -347,16 +355,16 @@ class _StreakCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(width: 1, height: 48, color: T.border),
+          Container(width: 1, height: 48, color: t.border),
           const SizedBox(width: 16),
           // Best streak
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'BEST STREAK',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4, color: T.textSecondary),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4, color: t.textSecondary),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -391,21 +399,22 @@ class _ChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final hasData = chartData.any((p) => p.hasData);
     final maxWpm = chartData.isEmpty ? 1.0 : chartData.map((p) => p.effWpm).reduce(math.max).clamp(1.0, double.infinity);
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(),
+      decoration: t.card(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Effective WPM',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: T.textPrimary),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: t.textPrimary),
               ),
               Row(
                 children: [
@@ -416,7 +425,7 @@ class _ChartCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     period == StatsPeriod.week ? 'per day' : period == StatsPeriod.month ? 'per 5 days' : 'per month',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: T.textSecondary),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: t.textSecondary),
                   ),
                 ],
               ),
@@ -424,12 +433,12 @@ class _ChartCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (!hasData)
-            const SizedBox(
+            SizedBox(
               height: 120,
               child: Center(
                 child: Text(
                   'No data yet for this period',
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
               ),
             )
@@ -473,6 +482,7 @@ class _ChartBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final heightFraction = point.hasData ? (point.effWpm / maxWpm).clamp(0.04, 1.0) : 0.03;
     final isToday = point.isToday;
 
@@ -492,7 +502,7 @@ class _ChartBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
-                    color: isToday ? T.primary : T.textSecondary,
+                    color: isToday ? T.primary : t.textSecondary,
                   ),
                 ),
               ),
@@ -509,7 +519,7 @@ class _ChartBar extends StatelessWidget {
                             : [T.primary.withValues(alpha: 0.7), T.accentViolet.withValues(alpha: 0.7)],
                       )
                     : null,
-                color: point.hasData ? null : T.border.withValues(alpha: 0.4),
+                color: point.hasData ? null : t.border.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(6),
               ),
             ),
@@ -519,7 +529,7 @@ class _ChartBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isToday ? FontWeight.w700 : FontWeight.w600,
-                color: isToday ? T.primary : T.textSecondary,
+                color: isToday ? T.primary : t.textSecondary,
               ),
             ),
           ],
@@ -539,9 +549,10 @@ class _WeakSkillsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(),
+      decoration: t.card(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -549,16 +560,16 @@ class _WeakSkillsCard extends StatelessWidget {
             children: [
               const Icon(Icons.analytics_outlined, size: 16, color: T.warning),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Areas to improve',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: T.textPrimary),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: t.textPrimary),
               ),
             ],
           ),
           const SizedBox(height: 12),
           for (int i = 0; i < weakSkills.length; i++) ...[
             if (i > 0) ...[
-              const Divider(height: 20, thickness: 0.8, color: T.border),
+              Divider(height: 20, thickness: 0.8, color: t.border),
             ],
             _WeakSkillRow(skill: weakSkills[i]),
           ],
@@ -574,6 +585,7 @@ class _WeakSkillRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       children: [
         // Score ring indicator
@@ -589,7 +601,7 @@ class _WeakSkillRow extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: skill.score / 100,
                   strokeWidth: 4,
-                  backgroundColor: T.border,
+                  backgroundColor: t.border,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     skill.score < 50 ? T.error : T.warning,
                   ),
@@ -597,10 +609,10 @@ class _WeakSkillRow extends StatelessWidget {
               ),
               Text(
                 '${skill.score.round()}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -613,12 +625,12 @@ class _WeakSkillRow extends StatelessWidget {
             children: [
               Text(
                 skill.displayName,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: T.textPrimary),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: t.textPrimary),
               ),
               const SizedBox(height: 2),
               Text(
                 skill.detail,
-                style: const TextStyle(fontSize: 12, color: T.textSecondary),
+                style: TextStyle(fontSize: 12, color: t.textSecondary),
               ),
             ],
           ),
@@ -635,7 +647,7 @@ class _WeakSkillRow extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 14),
             decoration: BoxDecoration(
-              color: T.primaryBg,
+              color: t.primaryBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Text(
@@ -659,6 +671,7 @@ class _HistoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -669,14 +682,14 @@ class _HistoryButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
         alignment: Alignment.center,
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.history_rounded, size: 18, color: T.primary),
             SizedBox(width: 8),
             Text(

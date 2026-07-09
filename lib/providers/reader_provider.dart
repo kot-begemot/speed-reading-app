@@ -4,6 +4,7 @@ import '../models/book_meta.dart';
 import '../models/reader_settings.dart';
 import '../models/tokenized_text.dart';
 import '../services/reader_engine.dart';
+import '../utils/book_start_hunter.dart';
 import '../utils/word_tokenizer.dart';
 import 'books_provider.dart';
 import 'settings_provider.dart';
@@ -61,12 +62,17 @@ final readerSessionProvider =
   final raw = await storage.readBookText(bookId);
   final text = WordTokenizer.tokenize(raw);
 
+  var initialIndex = book.currentWordIndex;
+  if (initialIndex == 0) {
+    initialIndex = BookStartHunter.findContentStartIndex(text);
+  }
+
   engine = ReaderEngine(
     bookId: bookId,
     text: text,
     wordsPerMinute: settings.wordsPerMinute,
     wordsPerEntry: settings.wordsPerEntry,
-    initialWordIndex: book.currentWordIndex,
+    initialWordIndex: initialIndex,
   );
 
   return ReaderSession(book: book, text: text, engine: engine);

@@ -38,6 +38,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final grouped = ref.watch(sessionHistoryProvider(widget.lang));
 
     // Apply filter across all groups
@@ -50,7 +51,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     final isEmpty = filtered.isEmpty;
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -96,19 +97,20 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
 class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_rounded, size: 24, color: T.textPrimary),
+            child: Icon(Icons.arrow_back_rounded, size: 24, color: t.textPrimary),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
               'Session History',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: T.textPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: t.textPrimary),
             ),
           ),
         ],
@@ -128,6 +130,7 @@ class _FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     const labels = {
       _Filter.all: 'All',
       _Filter.qualified: 'Qualified',
@@ -154,16 +157,16 @@ class _FilterChips extends StatelessWidget {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: selected ? T.primary : T.surfaceLowest,
+                      color: selected ? T.primary : t.surfaceLowest,
                       borderRadius: BorderRadius.circular(18),
-                      border: selected ? null : Border.all(color: T.border, width: 0.8),
+                      border: selected ? null : Border.all(color: t.border, width: 0.8),
                     ),
                     child: Text(
                       labels[f]!,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                        color: selected ? T.onPrimary : T.textSecondary,
+                        color: selected ? T.onPrimary : t.textSecondary,
                       ),
                     ),
                   ),
@@ -187,13 +190,14 @@ class _GroupLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 0.8,
-        color: T.textSecondary,
+        color: t.textSecondary,
       ),
     );
   }
@@ -205,13 +209,14 @@ class _SessionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Container(
-      decoration: T.card(),
+      decoration: t.card(),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           for (int i = 0; i < sessions.length; i++) ...[
-            if (i > 0) const Divider(height: 1, thickness: 1, color: T.border),
+            if (i > 0) Divider(height: 1, thickness: 1, color: t.border),
             _SessionRow(session: sessions[i]),
           ],
         ],
@@ -244,7 +249,7 @@ class _SessionRow extends StatelessWidget {
       case 'peripheral_vision':
         return (Icons.visibility_rounded, T.accentViolet);
       default:
-        return (Icons.fitness_center_rounded, T.textSecondary);
+        return (Icons.fitness_center_rounded, T.accentTeal);
     }
   }
 
@@ -300,6 +305,7 @@ class _SessionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final (icon, color) = _iconAndColor;
 
     return Padding(
@@ -327,7 +333,7 @@ class _SessionRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         _title,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: T.textPrimary),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: t.textPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -342,14 +348,14 @@ class _SessionRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         _meta,
-                        style: const TextStyle(fontSize: 12, color: T.textSecondary),
+                        style: TextStyle(fontSize: 12, color: t.textSecondary),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       _time,
-                      style: TextStyle(fontSize: 11, color: T.textSecondary.withValues(alpha: 0.6)),
+                      style: TextStyle(fontSize: 11, color: t.textSecondary.withValues(alpha: 0.6)),
                     ),
                   ],
                 ),
@@ -369,17 +375,18 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (!hasReading) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 7),
-        decoration: BoxDecoration(color: T.surfaceLow, borderRadius: BorderRadius.circular(6)),
-        child: const Text('DRILL', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: T.textSecondary)),
+        decoration: BoxDecoration(color: t.surfaceLow, borderRadius: BorderRadius.circular(6)),
+        child: Text('DRILL', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: t.textSecondary)),
       );
     }
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 7),
       decoration: BoxDecoration(
-        color: qualified ? T.successBg : T.dangerBg,
+        color: qualified ? t.successBg : t.dangerBg,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -404,6 +411,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final msg = filter == _Filter.all
         ? 'No sessions yet.\nComplete a training session to see history.'
         : 'No ${filter.name} sessions found\nfor this filter.';
@@ -417,13 +425,13 @@ class _EmptyState extends StatelessWidget {
             Icon(
               filter == _Filter.all ? Icons.history_rounded : Icons.filter_list_off_rounded,
               size: 56,
-              color: T.textSecondary.withValues(alpha: 0.4),
+              color: t.textSecondary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
               msg,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: T.textSecondary, height: 1.5),
+              style: TextStyle(fontSize: 14, color: t.textSecondary, height: 1.5),
             ),
           ],
         ),
