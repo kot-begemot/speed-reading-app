@@ -34,6 +34,7 @@ class SessionResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     // Session is qualified if speed >= targetWpm and comprehension >= minComprehension of level
     // Level min comprehension is: Level 1-2: 70%, Level 3-4: 65%, Level 5+: 60%
     final int minComprehension = level <= 2 ? 70 : (level <= 4 ? 65 : 60);
@@ -41,7 +42,7 @@ class SessionResultScreen extends StatelessWidget {
     final int effectiveWpm = (rawWpm * (comprehensionRate / 100)).round();
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -55,11 +56,11 @@ class SessionResultScreen extends StatelessWidget {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
-                        color: T.surfaceLow,
+                      decoration: BoxDecoration(
+                        color: t.surfaceLow,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close_rounded, size: 24, color: T.textSecondary),
+                      child: Icon(Icons.close_rounded, size: 24, color: t.textSecondary),
                     ),
                   ),
                 ],
@@ -70,9 +71,9 @@ class SessionResultScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   children: [
-                    _banner(isQualified),
+                    _banner(isQualified, t),
                     const SizedBox(height: 24),
-                    _heroMetric(effectiveWpm),
+                    _heroMetric(effectiveWpm, t),
                     const SizedBox(height: 20),
                     Row(
                       children: [
@@ -94,13 +95,13 @@ class SessionResultScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _criteriaCard(isQualified, minComprehension),
+                    _criteriaCard(isQualified, minComprehension, t),
                     const SizedBox(height: 24),
-                    _streakCard(isQualified),
+                    _streakCard(isQualified, t),
                     const SizedBox(height: 32),
                     _cta(),
                     const SizedBox(height: 16),
-                    _secondaryRow(),
+                    _secondaryRow(t),
                   ],
                 ),
               ),
@@ -111,14 +112,14 @@ class SessionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _banner(bool isQualified) {
+  Widget _banner(bool isQualified, TTheme t) {
     return Column(
       children: [
         Container(
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: isQualified ? T.successBg : T.dangerBg,
+            color: isQualified ? t.successBg : t.dangerBg,
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
@@ -141,18 +142,18 @@ class SessionResultScreen extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           'Text Exercise · ${language.toUpperCase()} · Level $level',
-          style: const TextStyle(fontSize: 14, color: T.textSecondary, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 14, color: t.textSecondary, fontWeight: FontWeight.w500),
         ),
       ],
     );
   }
 
-  Widget _heroMetric(int effectiveWpm) {
+  Widget _heroMetric(int effectiveWpm, TTheme t) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: T.primaryBg,
+        color: t.primaryBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: T.primary.withValues(alpha: 0.15), width: 1),
       ),
@@ -182,9 +183,9 @@ class SessionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _criteriaCard(bool isQualified, int minComprehension) {
+  Widget _criteriaCard(bool isQualified, int minComprehension, TTheme t) {
     return Container(
-      decoration: T.card(radius: 16),
+      decoration: t.card(radius: 16),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
@@ -192,25 +193,28 @@ class SessionResultScreen extends StatelessWidget {
             'Speed target ≥ $targetWpm WPM',
             '$rawWpm WPM',
             rawWpm >= targetWpm,
+            t,
           ),
-          const Divider(height: 1, thickness: 0.8, color: T.border),
+          Divider(height: 1, thickness: 0.8, color: t.border),
           _criteriaRow(
             'Comprehension target ≥ $minComprehension%',
             '$comprehensionRate%',
             comprehensionRate >= minComprehension,
+            t,
           ),
-          const Divider(height: 1, thickness: 0.8, color: T.border),
+          Divider(height: 1, thickness: 0.8, color: t.border),
           _criteriaRow(
             'Text completion 100%',
             'Completed',
             true,
+            t,
           ),
         ],
       ),
     );
   }
 
-  Widget _criteriaRow(String label, String value, bool passed) {
+  Widget _criteriaRow(String label, String value, bool passed, TTheme t) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       child: Row(
@@ -224,7 +228,7 @@ class SessionResultScreen extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: T.textPrimary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: t.textPrimary),
             ),
           ),
           Text(
@@ -240,26 +244,26 @@ class SessionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _streakCard(bool isQualified) {
+  Widget _streakCard(bool isQualified, TTheme t) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
+      decoration: t.card(radius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Consecutive successful sessions',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: T.textPrimary),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: t.textPrimary),
               ),
               Text(
                 '$consecutiveSuccessfulSessions / $sessionsRequiredForPromotion',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  color: isQualified ? T.success : T.textSecondary,
+                  color: isQualified ? T.success : t.textSecondary,
                 ),
               ),
             ],
@@ -276,7 +280,7 @@ class SessionResultScreen extends StatelessWidget {
                   child: Container(
                     height: 6,
                     decoration: BoxDecoration(
-                      color: isFilled ? T.success : T.borderStrong.withValues(alpha: 0.5),
+                      color: isFilled ? T.success : t.borderStrong.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -299,13 +303,13 @@ class SessionResultScreen extends StatelessWidget {
           ] else if (!isQualified) ...[
             const SizedBox(height: 12),
             Row(
-              children: const [
-                Icon(Icons.info_outline_rounded, size: 16, color: T.textSecondary),
-                SizedBox(width: 8),
+              children: [
+                Icon(Icons.info_outline_rounded, size: 16, color: t.textSecondary),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Qualified streak was reset. Try again with comfortable focus.',
-                    style: TextStyle(fontSize: 12, color: T.textSecondary, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 12, color: t.textSecondary, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -342,20 +346,20 @@ class SessionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _secondaryRow() {
+  Widget _secondaryRow(TTheme t) {
     return Row(
       children: [
         Expanded(
           child: OutlinedButton.icon(
             onPressed: onRepeat,
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: T.textSecondary),
-            label: const Text(
+            icon: Icon(Icons.refresh_rounded, size: 18, color: t.textSecondary),
+            label: Text(
               'Repeat',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: T.textSecondary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: t.textSecondary),
             ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: T.border),
+              side: BorderSide(color: t.border),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -366,14 +370,14 @@ class SessionResultScreen extends StatelessWidget {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: onGoToProgress,
-            icon: const Icon(Icons.bar_chart_rounded, size: 18, color: T.textSecondary),
-            label: const Text(
+            icon: Icon(Icons.bar_chart_rounded, size: 18, color: t.textSecondary),
+            label: Text(
               'Progress',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: T.textSecondary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: t.textSecondary),
             ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: T.border),
+              side: BorderSide(color: t.border),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),

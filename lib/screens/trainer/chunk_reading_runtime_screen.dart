@@ -8,6 +8,8 @@ import 'trainer_tokens.dart';
 import '../../services/distractor_generator.dart';
 import '../../models/book_meta.dart';
 import '../../providers/books_provider.dart';
+import '../../utils/book_start_hunter.dart';
+import '../../utils/word_tokenizer.dart';
 
 class _ChunkQuestion {
   final String question;
@@ -231,7 +233,12 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
       final fullText = await storage.readBookText(book.id);
       
       final allWords = fullText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
-      final startIndex = book.currentWordIndex;
+      var startIndex = book.currentWordIndex;
+      
+      if (startIndex == 0) {
+        final tokenized = WordTokenizer.tokenize(fullText);
+        startIndex = BookStartHunter.findContentStartIndex(tokenized);
+      }
       
       final actualStart = (startIndex >= allWords.length) ? 0 : startIndex;
       final actualEnd = (actualStart + 100 < allWords.length) ? actualStart + 100 : allWords.length;

@@ -82,7 +82,7 @@ const _drills = <_DrillDef>[
   _DrillDef(
     type: 'chunk_reading',
     icon: Icons.view_column,
-    accent: T.textSecondary,
+    accent: T.accentTeal,
     title: 'Chunk Reading',
     purpose: 'Read in 2–4 word groups',
     unlockLevel: 4,
@@ -170,33 +170,34 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
   }
 
   void _showLockedDialog(BuildContext context, _DrillDef drill) {
+    final t = T.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: T.surface,
-          surfaceTintColor: T.surface,
+          backgroundColor: t.surface,
+          surfaceTintColor: t.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Icon(Icons.lock_outline_rounded, color: drill.accent, size: 24),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Skill Locked',
-                style: TextStyle(fontWeight: FontWeight.w800, color: T.textPrimary),
+                style: TextStyle(fontWeight: FontWeight.w800, color: t.textPrimary),
               ),
             ],
           ),
           content: Text(
             'To practice "${drill.title}", you need to reach Level ${drill.unlockLevel} in the Training Program.\n\nYour current level is based on your daily training progression.',
-            style: const TextStyle(fontSize: 14, color: T.textSecondary, height: 1.4),
+            style: TextStyle(fontSize: 14, color: t.textSecondary, height: 1.4),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
+              child: Text(
                 'Close',
-                style: TextStyle(fontWeight: FontWeight.w700, color: T.textSecondary),
+                style: TextStyle(fontWeight: FontWeight.w700, color: t.textSecondary),
               ),
             ),
             ElevatedButton(
@@ -226,6 +227,7 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final lang = ref.watch(activeTrainerLanguageProvider);
     final settings = ref.watch(settingsProvider);
     final profileAsync = ref.watch(trainerProfileProvider);
@@ -258,22 +260,22 @@ class _SkillTrainingScreenState extends ConsumerState<SkillTrainingScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () => Navigator.maybePop(context),
         ),
-        title: const Text(
+        title: Text(
           'Skill Training',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -372,13 +374,14 @@ class _EmptyRecommended extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final t = T.of(context);
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Text(
           'No recommendations right now — nice work! Check back after your next session.',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: T.textSecondary, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 14, color: t.textSecondary, fontWeight: FontWeight.w500),
         ),
       ),
     );
@@ -394,6 +397,7 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return SizedBox(
       height: 36,
       child: Material(
@@ -405,16 +409,16 @@ class _FilterChip extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: selected ? T.primary : T.surfaceLowest,
+              color: selected ? T.primary : t.surfaceLowest,
               borderRadius: BorderRadius.circular(18),
-              border: selected ? null : Border.all(color: T.border, width: 0.8),
+              border: selected ? null : Border.all(color: t.border, width: 0.8),
             ),
             child: Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                color: selected ? T.onPrimary : T.textSecondary,
+                color: selected ? T.onPrimary : t.textSecondary,
               ),
             ),
           ),
