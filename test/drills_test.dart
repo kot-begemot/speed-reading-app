@@ -4,6 +4,10 @@ import 'package:speed_reading_app/screens/trainer/schulte_runtime_screen.dart';
 import 'package:speed_reading_app/screens/trainer/number_tracking_runtime_screen.dart';
 import 'package:speed_reading_app/screens/trainer/peripheral_vision_runtime_screen.dart';
 import 'package:speed_reading_app/screens/trainer/flash_recognition_runtime_screen.dart';
+import 'package:speed_reading_app/screens/trainer/schulte_gorbov_runtime_screen.dart';
+import 'package:speed_reading_app/screens/trainer/word_match_runtime_screen.dart';
+import 'package:speed_reading_app/screens/trainer/pyramid_expansion_runtime_screen.dart';
+import 'package:speed_reading_app/screens/trainer/chunk_reading_runtime_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +20,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: SchulteRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -65,6 +70,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: NumberTrackingRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -121,6 +127,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: PeripheralVisionRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -168,6 +175,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: FlashRecognitionRuntimeScreen(
+          showIntro: false,
           onComplete: (score, errors, durationSecs) {
             scoreValue = score;
             errorsValue = errors;
@@ -209,6 +217,159 @@ void main() {
     await tester.pump();
 
     expect(scoreValue, 100); // 100% accuracy
+    expect(errorsValue, 0);
+  });
+
+  testWidgets('Schulte-Gorbov Table game loop verification', (tester) async {
+    int? scoreValue;
+    int? errorsValue;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SchulteGorbovRuntimeScreen(
+          showIntro: false,
+          onComplete: (score, errors, durationSecs) {
+            scoreValue = score;
+            errorsValue = errors;
+          },
+        ),
+      ),
+    );
+
+    final state = tester.state<SchulteGorbovRuntimeScreenState>(find.byType(SchulteGorbovRuntimeScreen));
+
+    // Tap all 49 numbers in order
+    for (int step = 0; step < 49; step++) {
+      final isBlack = state.expectBlack;
+      final targetVal = isBlack ? state.nextBlack : state.nextRed;
+
+      final index = state.cells.indexWhere((c) => c.value == targetVal && c.isBlack == isBlack);
+      expect(index, isNot(-1));
+
+      final cellFinder = find.descendant(
+        of: find.byType(AspectRatio),
+        matching: find.byType(GestureDetector),
+      ).at(index);
+
+      await tester.tap(cellFinder);
+      await tester.pump();
+    }
+
+    expect(find.text('Exercise Complete!'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+
+    expect(scoreValue, 100);
+    expect(errorsValue, 0);
+  });
+
+  testWidgets('Visual Word Match game loop verification', (tester) async {
+    int? scoreValue;
+    int? errorsValue;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WordMatchRuntimeScreen(
+          showIntro: false,
+          onComplete: (score, errors, durationSecs) {
+            scoreValue = score;
+            errorsValue = errors;
+          },
+        ),
+      ),
+    );
+
+    final state = tester.state<WordMatchRuntimeScreenState>(find.byType(WordMatchRuntimeScreen));
+
+    for (int r = 0; r < 10; r++) {
+      final target = state.rounds[state.currentRoundIndex].target;
+      final optionFinder = find.descendant(
+        of: find.byType(GestureDetector),
+        matching: find.text(target),
+      ).first;
+
+      await tester.tap(optionFinder);
+      await tester.pump();
+    }
+
+    expect(find.text('Exercise Complete!'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+
+    expect(scoreValue, 100);
+    expect(errorsValue, 0);
+  });
+
+  testWidgets('Pyramid Expansion game loop verification', (tester) async {
+    int? scoreValue;
+    int? errorsValue;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PyramidExpansionRuntimeScreen(
+          showIntro: false,
+          onComplete: (score, errors, durationSecs) {
+            scoreValue = score;
+            errorsValue = errors;
+          },
+        ),
+      ),
+    );
+
+    final state = tester.state<PyramidExpansionRuntimeScreenState>(find.byType(PyramidExpansionRuntimeScreen));
+
+    for (int r = 0; r < 5; r++) {
+      // Pump past 5 line highlights
+      await tester.pump(const Duration(milliseconds: 4500));
+      expect(state.isVerificationPhase, isTrue);
+
+      final target = state.rounds[state.currentRoundIndex].targetWord;
+      await tester.tap(find.text(target));
+      await tester.pump();
+    }
+
+    expect(find.text('Exercise Complete!'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+
+    expect(scoreValue, 100);
+    expect(errorsValue, 0);
+  });
+
+  testWidgets('Chunk Reading game loop verification', (tester) async {
+    int? scoreValue;
+    int? errorsValue;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChunkReadingRuntimeScreen(
+          showIntro: false,
+          onComplete: (score, errors, durationSecs) {
+            scoreValue = score;
+            errorsValue = errors;
+          },
+        ),
+      ),
+    );
+
+    final state = tester.state<ChunkReadingRuntimeScreenState>(find.byType(ChunkReadingRuntimeScreen));
+
+    // Pump past all chunk advances (approx 25 seconds)
+    await tester.pump(const Duration(seconds: 25));
+    expect(state.isQuestionPhase, isTrue);
+
+    // Answer 3 questions
+    for (int q = 0; q < 3; q++) {
+      final answer = state.currentCorrectAnswer;
+      await tester.tap(find.text(answer));
+      await tester.pump();
+    }
+
+    expect(find.text('Exercise Complete!'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+
+    expect(scoreValue, isNotNull);
     expect(errorsValue, 0);
   });
 }

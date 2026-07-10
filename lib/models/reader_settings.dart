@@ -30,6 +30,7 @@ class ReaderSettings {
   final int wordsPerEntry;
   final bool showHelperText;
   final ThemeMode themeMode;
+  final bool unlockAllSkills;
 
   // --- Light Theme Colors ---
   final Color? currentWordColorLight;
@@ -57,6 +58,7 @@ class ReaderSettings {
     this.wordsPerEntry = 1,
     this.showHelperText = true,
     this.themeMode = ThemeMode.system,
+    this.unlockAllSkills = false,
     
     // Light Defaults
     this.currentWordColorLight,
@@ -96,6 +98,7 @@ class ReaderSettings {
     int? wordsPerEntry,
     bool? showHelperText,
     ThemeMode? themeMode,
+    bool? unlockAllSkills,
     
     // Light
     Color? currentWordColorLight,
@@ -123,6 +126,7 @@ class ReaderSettings {
       wordsPerEntry: wordsPerEntry ?? this.wordsPerEntry,
       showHelperText: showHelperText ?? this.showHelperText,
       themeMode: themeMode ?? this.themeMode,
+      unlockAllSkills: unlockAllSkills ?? this.unlockAllSkills,
       
       // Light
       currentWordColorLight: currentWordColorLight ?? this.currentWordColorLight,
@@ -152,6 +156,7 @@ class ReaderSettings {
         'wordsPerEntry': wordsPerEntry,
         'showHelperText': showHelperText,
         'themeMode': themeMode.name,
+        'unlockAllSkills': unlockAllSkills,
         
         // Light
         'currentWordColorLight': currentWordColorLight?.toARGB32(),
@@ -196,6 +201,7 @@ class ReaderSettings {
       showHelperText: json['showHelperText'] as bool? ?? defaults.showHelperText,
       themeMode: ThemeMode.values
           .byName(json['themeMode'] as String? ?? defaults.themeMode.name),
+      unlockAllSkills: json['unlockAllSkills'] as bool? ?? defaults.unlockAllSkills,
       
       // Light
       currentWordColorLight: colorOrNull(json['currentWordColorLight'] ?? legacyCurrentWord),
@@ -233,6 +239,7 @@ class ReaderSettings {
       other.wordsPerEntry == wordsPerEntry &&
       other.showHelperText == showHelperText &&
       other.themeMode == themeMode &&
+      other.unlockAllSkills == unlockAllSkills &&
       
       // Light
       other.currentWordColorLight == currentWordColorLight &&
@@ -261,6 +268,7 @@ class ReaderSettings {
         wordsPerEntry,
         showHelperText,
         themeMode,
+        unlockAllSkills,
         currentWordColorLight,
         backgroundColorLight,
         focusBackgroundColorLight,

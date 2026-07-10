@@ -807,9 +807,37 @@ class TrainerHomeScreen extends ConsumerWidget {
             badge = 'PRACTICE';
           }
 
-          final exerciseNames = session.exerciseResults.map((r) => _prettyExerciseName(r.exerciseType)).join(', ');
-          final displayTitle = exerciseNames.isNotEmpty ? exerciseNames : 'Training Session';
-          final displayMeta = '${session.finalWpm} wpm · ${session.comprehensionPercent}% comprehension';
+          final hasReading = session.finalWpm > 0;
+          final hasBaseline = session.exerciseResults.any((e) => e.exerciseType == 'baseline_reading');
+
+          String displayTitle;
+          String displayMeta;
+
+          if (hasBaseline) {
+            displayTitle = 'Baseline Diagnostic';
+            displayMeta = '${session.finalWpm} wpm · ${session.comprehensionPercent}% comprehension';
+          } else if (hasReading) {
+            displayTitle = 'Training Program · Level ${session.level}';
+            displayMeta = '${session.finalWpm} wpm · ${session.comprehensionPercent}% comprehension';
+          } else {
+            final r = session.exerciseResults.isNotEmpty ? session.exerciseResults.first : null;
+            if (r != null) {
+              displayTitle = _prettyExerciseName(r.exerciseType);
+              final type = r.exerciseType;
+              final mistakesStr = r.mistakes == 1 ? '1 mistake' : '${r.mistakes ?? 0} mistakes';
+              if (type == 'schulte' || type == 'number_tracking') {
+                displayMeta = 'Duration: ${r.durationSeconds}s · $mistakesStr';
+              } else if (type == 'flash_recognition' || type == 'peripheral_vision') {
+                final accuracyStr = r.accuracyPercent != null ? '${r.accuracyPercent!.round()}% accuracy' : '100% accuracy';
+                displayMeta = '$accuracyStr · $mistakesStr';
+              } else {
+                displayMeta = 'Duration: ${r.durationSeconds}s';
+              }
+            } else {
+              displayTitle = 'Practice Session';
+              displayMeta = '';
+            }
+          }
 
           return _sessionRow(icon, statusColor, badgeBg, badge, badgeText, displayTitle, displayMeta);
         },

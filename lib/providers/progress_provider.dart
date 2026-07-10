@@ -390,12 +390,20 @@ String _formatDrillResult(String exerciseType, ExerciseResult r) {
   switch (exerciseType) {
     case 'schulte':
       return '5×5 · ${r.durationSeconds}s';
+    case 'schulte_gorbov':
+      return '7×7 · ${r.durationSeconds}s';
     case 'number_tracking':
       return '${r.accuracyPercent?.round() ?? 0}% · ${r.durationSeconds}s';
     case 'peripheral_vision':
       return '${r.accuracyPercent?.round() ?? 0}% · 8 pos';
     case 'flash_recognition':
       return '${r.accuracyPercent?.round() ?? 0}% · ${r.mistakes ?? 0} err';
+    case 'chunk_reading':
+      return '${r.accuracyPercent?.round() ?? 0} WPM';
+    case 'pyramid_expansion':
+      return '${r.accuracyPercent?.round() ?? 0}% · ${r.durationSeconds}s';
+    case 'word_match':
+      return '${r.accuracyPercent?.round() ?? 0}% · ${r.durationSeconds}s';
     default:
       return '${r.accuracyPercent?.round() ?? 0}%';
   }
@@ -415,7 +423,7 @@ DrillStat _computeDrillStat(List<TrainingSession> sessions, String exerciseType)
   entries.sort((a, b) => b.$1.compareTo(a.$1));
   final last = entries.first.$2;
 
-  final best = exerciseType == 'schulte'
+  final best = (exerciseType == 'schulte' || exerciseType == 'schulte_gorbov')
       ? entries.map((e) => e.$2).reduce((a, b) => a.durationSeconds <= b.durationSeconds ? a : b)
       : entries.map((e) => e.$2).reduce(
           (a, b) => (a.accuracyPercent ?? 0) >= (b.accuracyPercent ?? 0) ? a : b);

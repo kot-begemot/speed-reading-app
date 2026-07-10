@@ -34,6 +34,8 @@ class SettingsNotifier extends Notifier<ReaderSettings> {
       update(state.copyWith(showHelperText: value));
   void setThemeMode(ThemeMode value) =>
       update(state.copyWith(themeMode: value));
+  void setUnlockAllSkills(bool value) =>
+      update(state.copyWith(unlockAllSkills: value));
 
   void setColor(ReaderColorSlot slot, Color color, {bool isDark = false}) {
     if (isDark) {
@@ -82,6 +84,7 @@ class SettingsNotifier extends Notifier<ReaderSettings> {
         wordsPerEntry: state.wordsPerEntry,
         showHelperText: state.showHelperText,
         themeMode: state.themeMode,
+        unlockAllSkills: state.unlockAllSkills,
       ));
 
   void resetToDefaults() => update(const ReaderSettings());

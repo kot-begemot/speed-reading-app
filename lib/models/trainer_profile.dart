@@ -40,6 +40,30 @@ class TrainerLanguageProfile extends HiveObject {
   @HiveField(5)
   DateTime? lastSessionAt;
 
+  @HiveField(6)
+  int? activeStepIndex;
+
+  @HiveField(7)
+  String? activeSelectedTextId;
+
+  @HiveField(8)
+  int? activeWarmUpErrors;
+
+  @HiveField(9)
+  int? activeWarmUpDurationSecs;
+
+  @HiveField(10)
+  int? activeRecognitionAccuracy;
+
+  @HiveField(11)
+  int? activeRecognitionErrors;
+
+  @HiveField(12)
+  int? activeReadingWpm;
+
+  @HiveField(13)
+  int? activeWordsRead;
+
   TrainerLanguageProfile({
     required this.languageCode,
     this.currentLevel = 1,
@@ -47,5 +71,13 @@ class TrainerLanguageProfile extends HiveObject {
     this.bestEffectiveWpm = 0,
     this.baselineCompletedAt,
     this.lastSessionAt,
+    this.activeStepIndex,
+    this.activeSelectedTextId,
+    this.activeWarmUpErrors,
+    this.activeWarmUpDurationSecs,
+    this.activeRecognitionAccuracy,
+    this.activeRecognitionErrors,
+    this.activeReadingWpm,
+    this.activeWordsRead,
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'trainer_tokens.dart';
+import '../../services/distractor_generator.dart';
 
 class _PeripheralRound {
   final String target;
@@ -21,10 +22,12 @@ class _PeripheralRound {
 /// stimuli at the periphery, requiring the user to recognize the word.
 class PeripheralVisionRuntimeScreen extends StatefulWidget {
   final void Function(int score, int errors, int durationSecs)? onComplete;
+  final bool showIntro;
 
   const PeripheralVisionRuntimeScreen({
     super.key,
     this.onComplete,
+    this.showIntro = true,
   });
 
   @override
@@ -47,6 +50,26 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
     ['flame', 'frame', 'shame', 'blame'],
     ['beach', 'bench', 'reach', 'peach'],
     ['smart', 'start', 'shirt', 'smash'],
+    ['plant', 'plane', 'paint', 'point'],
+    ['sound', 'round', 'bound', 'pound'],
+    ['shore', 'share', 'score', 'chore'],
+    ['sleep', 'sheep', 'steep', 'sweep'],
+    ['cream', 'dream', 'scream', 'steam'],
+    ['track', 'trick', 'truck', 'trace'],
+    ['pride', 'price', 'prize', 'prime'],
+    ['watch', 'match', 'catch', 'patch'],
+    ['bread', 'break', 'broad', 'beard'],
+    ['glass', 'grass', 'gloss', 'class'],
+    ['force', 'forge', 'farce', 'focus'],
+    ['smoke', 'smile', 'smell', 'smart'],
+    ['fruit', 'fluid', 'flute', 'front'],
+    ['spoke', 'spine', 'space', 'spare'],
+    ['black', 'block', 'blank', 'blink'],
+    ['climb', 'claim', 'clear', 'clean'],
+    ['stage', 'stare', 'share', 'stave'],
+    ['place', 'plate', 'plane', 'phase'],
+    ['count', 'court', 'coast', 'craft'],
+    ['proud', 'prove', 'proof', 'group'],
   ];
 
   late List<_PeripheralRound> _rounds;
@@ -54,6 +77,7 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
   int _errorCount = 0;
   int _correctCount = 0;
   bool _isFinished = false;
+  late bool _showIntro;
 
   // Flash phases: 'waiting', 'flashing', 'answering', 'feedback'
   String _flashPhase = 'waiting'; 
@@ -65,7 +89,12 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
   @override
   void initState() {
     super.initState();
-    _startNewGame();
+    _showIntro = widget.showIntro;
+    if (_showIntro) {
+      _rounds = [];
+    } else {
+      _startNewGame();
+    }
   }
 
   @override
@@ -94,23 +123,21 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
 
   void _generateRounds() {
     final rand = Random();
-    // Copy and shuffle word pool
-    final pool = [..._wordPool]..shuffle();
+    final Set<String> targets = {};
+    while (targets.length < _totalRounds) {
+      targets.add(DistractorGenerator.getRandomWord());
+    }
 
-    _rounds = List.generate(_totalRounds, (index) {
-      final item = pool[index % pool.length];
-      final target = item[0];
-      // Shuffle options for multiple choice
-      final options = [...item]..shuffle();
-      // Choose a random peripheral position angle index (0 to 7)
+    _rounds = targets.map((target) {
+      final distractors = DistractorGenerator.generateLookalikes(target, 3);
+      final options = [target, ...distractors]..shuffle();
       final angleIdx = rand.nextInt(8);
-
       return _PeripheralRound(
         target: target,
         options: options,
         angleIndex: angleIdx,
       );
-    });
+    }).toList();
   }
 
   void _startGlobalTimer() {
@@ -198,8 +225,300 @@ class PeripheralVisionRuntimeScreenState extends State<PeripheralVisionRuntimeSc
     return (_correctCount / totalRoundsPlayed * 100).round();
   }
 
+  void _startFromIntro() {
+    setState(() {
+      _showIntro = false;
+      _startNewGame();
+    });
+  }
+
+  Widget _buildIntroScreen() {
+    return Scaffold(
+      backgroundColor: T.surface,
+      appBar: AppBar(
+        backgroundColor: T.surface,
+        surfaceTintColor: T.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Exercise Intro',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: T.textPrimary,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SafeArea(
+              bottom: false,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                children: [
+                  _introHead(),
+                  const SizedBox(height: 24),
+                  _introGoalCard(),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'HOW TO PLAY',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _instructionsCard(),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'BENEFITS',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _benefitsCard(),
+                ],
+              ),
+            ),
+          ),
+          _introActions(),
+        ],
+      ),
+    );
+  }
+
+  Widget _introHead() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: T.warning.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.visibility, size: 30, color: T.warning),
+        ),
+        const SizedBox(width: 14),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Peripheral Vision',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: T.textPrimary,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Recognize words at the edges',
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.3,
+                  color: T.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _introGoalCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: T.successBg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.center_focus_strong, size: 22, color: T.success),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SUCCESS GOAL',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: T.success,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Identify flashed words · 10 rounds',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: T.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _instructionsCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: T.card(radius: 16),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InstructionRow(
+            number: '1',
+            text: 'Focus on the center: Keep your eyes fixed on the center crosshair (+) at all times.',
+          ),
+          SizedBox(height: 16),
+          _InstructionRow(
+            number: '2',
+            text: 'Flashing stimuli: A word will flash briefly at the edge of your screen.',
+          ),
+          SizedBox(height: 16),
+          _InstructionRow(
+            number: '3',
+            text: 'Identify the word: Select the correct word from the options at the bottom.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _benefitsCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: T.card(radius: 16),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '• Expand Peripheral Span: Increases your ability to perceive and read words outside your direct line of sight.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '• Minimize Eye Movements: Redirection of eye movement reduces fatigue and increases reading speed.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '• Boost Recognition Speed: Speeds up word recognition and cognitive translation.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: T.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _introActions() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: T.surfaceLowest,
+        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    side: const BorderSide(color: T.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Back',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: T.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: _startFromIntro,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: T.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Start',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_showIntro) {
+      return _buildIntroScreen();
+    }
     return Scaffold(
       backgroundColor: T.surface,
       body: SafeArea(
@@ -654,3 +973,48 @@ class _FaintDot extends StatelessWidget {
     );
   }
 }
+
+class _InstructionRow extends StatelessWidget {
+  final String number;
+  final String text;
+
+  const _InstructionRow({required this.number, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: T.surfaceLow,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            number,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: T.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: T.textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
