@@ -27,6 +27,7 @@ class RsvpRuntimeScreen extends StatefulWidget {
 }
 
 class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
+  TTheme get t => T.of(context);
   late List<String> _words;
   int _currentIndex = 0;
   bool _isPlaying = false;
@@ -36,19 +37,20 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
   int _metronomeTick = 2;
 
   // Reader colors
-  final ReaderColors _colors = const ReaderColors(
-    currentWord: T.textPrimary,
-    centralLetter: T.centralLetter,
-    guideLine: T.guideLine,
-    helperHighlight: T.primary,
-    background: T.surface,
-    focusBackground: T.surfaceLow,
-    progressBar: T.primary,
-  );
+  late final ReaderColors _colors;
 
   @override
   void initState() {
     super.initState();
+    _colors = ReaderColors(
+      currentWord: t.textPrimary,
+      centralLetter: T.centralLetter,
+      guideLine: T.guideLine,
+      helperHighlight: T.primary,
+      background: t.surface,
+      focusBackground: t.surfaceLow,
+      progressBar: T.primary,
+    );
     // Parse text into words, filter out empty ones
     _words = widget.textContent
         .split(RegExp(r'\s+'))
@@ -129,11 +131,12 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final double fraction = _currentIndex / _words.length;
     final currentWordStr = _words[_currentIndex];
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -171,9 +174,9 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _circleIcon(
-            fill: T.surfaceLow,
+            fill: t.surfaceLow,
             icon: Icons.close_rounded,
-            color: T.textSecondary,
+            color: t.textSecondary,
             onTap: () {
               Navigator.pop(context);
             },
@@ -185,24 +188,24 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
                 widget.textTitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _formatTimeLeft(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
           ),
           _circleIcon(
-            fill: T.primaryBg,
+            fill: t.primaryBg,
             icon: Icons.graphic_eq,
             color: T.primary,
             onTap: () {},
@@ -236,7 +239,7 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           decoration: BoxDecoration(
-            color: T.primaryBg,
+            color: t.primaryBg,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -246,7 +249,7 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
               const SizedBox(width: 5),
               Text(
                 'Target ${widget.targetWpm} WPM',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: T.primary,
@@ -290,15 +293,15 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
             children: [
               Text(
                 '${_currentIndex + 1} / ${_words.length} words',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 '${widget.targetWpm} WPM',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: T.primary,
@@ -311,7 +314,7 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
             borderRadius: BorderRadius.circular(2),
             child: Container(
               height: 4,
-              color: T.borderStrong.withValues(alpha: 0.5),
+              color: t.borderStrong.withValues(alpha: 0.5),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: fraction.clamp(0.0, 1.0),
@@ -329,14 +332,14 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
                   height: 52,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: T.surfaceLow,
+                    color: t.surfaceLow,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: T.border, width: 0.8),
+                    border: Border.all(color: t.border, width: 0.8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.replay_5,
                     size: 24,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ),
@@ -368,7 +371,7 @@ class _RsvpRuntimeScreenState extends State<RsvpRuntimeScreen> {
                         const SizedBox(width: 8),
                         Text(
                           _isPlaying ? 'Pause' : 'Resume',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: T.onPrimary,

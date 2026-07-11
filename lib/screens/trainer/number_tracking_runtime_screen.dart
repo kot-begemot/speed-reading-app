@@ -36,6 +36,7 @@ class NumberTrackingRuntimeScreen extends StatefulWidget {
 }
 
 class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen> {
+  TTheme get t => T.of(context);
   static const int _gridCols = 4;
   static const int _gridRows = 5;
   static const int _maxTarget = 9;
@@ -197,25 +198,25 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
 
   Widget _buildIntroScreen() {
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Exercise Intro',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -231,25 +232,25 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                   const SizedBox(height: 24),
                   _introGoalCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _instructionsCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BENEFITS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -279,7 +280,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
           child: const Icon(Icons.location_on, size: 30, color: T.accentTeal),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -288,7 +289,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -297,7 +298,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -311,10 +312,10 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: T.successBg,
+        color: t.successBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.center_focus_strong, size: 22, color: T.success),
@@ -338,7 +339,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],
@@ -352,8 +353,8 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
   Widget _instructionsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InstructionRow(
@@ -378,8 +379,8 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
   Widget _benefitsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -387,7 +388,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -396,7 +397,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -405,7 +406,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ],
@@ -415,9 +416,9 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
 
   Widget _introActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: T.surfaceLowest,
-        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      decoration: BoxDecoration(
+        color: t.surfaceLowest,
+        border: Border(top: BorderSide(color: t.border, width: 0.8)),
       ),
       child: SafeArea(
         top: false,
@@ -432,17 +433,17 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: T.border),
+                    side: BorderSide(color: t.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ),
@@ -461,7 +462,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 15,
@@ -479,11 +480,12 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (_showIntro) {
       return _buildIntroScreen();
     }
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -518,34 +520,34 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: T.surfaceLow,
+                color: t.surfaceLow,
                 shape: BoxShape.circle,
-                border: Border.all(color: T.border, width: 0.8),
+                border: Border.all(color: t.border, width: 0.8),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.close_rounded,
                 size: 20,
-                color: T.textSecondary,
+                color: t.textSecondary,
               ),
             ),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Number Tracking · Find next',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _formatTime(_elapsedSeconds),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -569,11 +571,11 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
-        child: Icon(icon, size: 20, color: T.textSecondary),
+        child: Icon(icon, size: 20, color: t.textSecondary),
       ),
     );
   }
@@ -585,9 +587,9 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Tap 1→9 in order · Next',
-            style: TextStyle(fontSize: 13, color: T.textSecondary),
+            style: TextStyle(fontSize: 13, color: t.textSecondary),
           ),
           const SizedBox(width: 8),
           Container(
@@ -600,7 +602,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
             ),
             child: Text(
               _nextTarget > _maxTarget ? '✓' : '$_nextTarget',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
@@ -649,8 +651,8 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
     );
   }
 
-  Widget _tokenWidget(_Token t) {
-    final isError = _flashingErrorLabel == t.label;
+  Widget _tokenWidget(_Token token) {
+    final isError = _flashingErrorLabel == token.label;
 
     Color fill;
     Color numberColor;
@@ -661,15 +663,15 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
       numberColor = T.error;
       border = Border.all(color: T.error, width: 1.6);
     } else {
-      switch (t.state) {
+      switch (token.state) {
         case _TokenState.done:
-          fill = T.surfaceLow.withValues(alpha: 0.4);
-          numberColor = T.textSecondary.withValues(alpha: 0.25);
+          fill = t.surfaceLow.withValues(alpha: 0.4);
+          numberColor = t.textSecondary.withValues(alpha: 0.25);
           break;
         case _TokenState.distractor:
-          fill = T.surfaceLowest;
-          numberColor = T.textPrimary;
-          border = Border.all(color: T.border, width: 0.8);
+          fill = t.surfaceLowest;
+          numberColor = t.textPrimary;
+          border = Border.all(color: t.border, width: 0.8);
           break;
       }
     }
@@ -685,7 +687,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
         border: border,
       ),
       child: Text(
-        '${t.label}',
+        '${token.label}',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -707,7 +709,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
               _MiniMetric(
                 label: 'FOUND',
                 value: '${_nextTarget - 1} / $_maxTarget',
-                valueColor: T.textPrimary,
+                valueColor: t.textPrimary,
               ),
               _MiniMetric(
                 label: 'ACCURACY',
@@ -717,7 +719,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
               _MiniMetric(
                 label: 'ERRORS',
                 value: '$_errorCount',
-                valueColor: _errorCount == 0 ? T.textPrimary : T.error,
+                valueColor: _errorCount == 0 ? t.textPrimary : T.error,
               ),
             ],
           ),
@@ -727,13 +729,13 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
             icon: Icon(_isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded, size: 20),
             label: Text(_isPaused ? 'Resume' : 'Pause'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: T.surfaceLowest,
-              foregroundColor: T.textPrimary,
+              backgroundColor: t.surfaceLowest,
+              foregroundColor: t.textPrimary,
               elevation: 0,
               minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
-                side: const BorderSide(color: T.border),
+                side: BorderSide(color: t.border),
               ),
             ),
           ),
@@ -745,7 +747,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
   Widget _buildPausedOverlay() {
     return Positioned.fill(
       child: Container(
-        color: T.surfaceLow.withValues(alpha: 0.96),
+        color: t.surfaceLow.withValues(alpha: 0.96),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -764,18 +766,18 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Training Paused',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Numbers are hidden to maintain focus.',
-                style: TextStyle(fontSize: 14, color: T.textSecondary),
+                style: TextStyle(fontSize: 14, color: t.textSecondary),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
@@ -788,7 +790,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'Resume Training',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                 ),
@@ -805,7 +807,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
 
     return Positioned.fill(
       child: Container(
-        color: T.surface.withValues(alpha: 0.98),
+        color: t.surface.withValues(alpha: 0.98),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -815,8 +817,8 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                 Container(
                   width: 68,
                   height: 68,
-                  decoration: const BoxDecoration(
-                    color: T.successBg,
+                  decoration: BoxDecoration(
+                    color: t.successBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -826,31 +828,31 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Exercise Complete!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'You finished Number Tracking successfully.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 // Stats Card
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: T.card(radius: 16),
+                  decoration: t.card(radius: 16),
                   child: Column(
                     children: [
                       _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Accuracy', '$acc%'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Errors committed', '$_errorCount'),
                     ],
                   ),
@@ -864,17 +866,17 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                           onPressed: _startNewGame,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: T.border),
+                            side: BorderSide(color: t.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Try Again',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: T.textPrimary,
+                              color: t.textPrimary,
                             ),
                           ),
                         ),
@@ -901,7 +903,7 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
                         ),
                         child: Text(
                           widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -925,18 +927,18 @@ class NumberTrackingRuntimeScreenState extends State<NumberTrackingRuntimeScreen
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ],
@@ -957,16 +959,17 @@ class _MiniMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         const SizedBox(height: 4),
@@ -991,6 +994,7 @@ class _InstructionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -998,16 +1002,16 @@ class _InstructionRow extends StatelessWidget {
           width: 24,
           height: 24,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: T.surfaceLow,
+          decoration: BoxDecoration(
+            color: t.surfaceLow,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
         ),
@@ -1015,10 +1019,10 @@ class _InstructionRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ),

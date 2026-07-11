@@ -20,6 +20,7 @@ class ComprehensionTestScreen extends StatefulWidget {
 }
 
 class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
+  TTheme get t => T.of(context);
   int _currentQuestionIndex = 0;
   
   // Maps question index to the selected option index (0 to 3)
@@ -84,6 +85,7 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (widget.questions.isEmpty) {
       return const Scaffold(
         body: Center(child: Text('No questions available.')),
@@ -95,7 +97,7 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
     final isLastQuestion = _currentQuestionIndex == widget.questions.length - 1;
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -113,10 +115,10 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                         Navigator.pop(context);
                       },
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close_rounded,
                         size: 22,
-                        color: T.textSecondary,
+                        color: t.textSecondary,
                       ),
                     ),
                   ),
@@ -126,7 +128,7 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                       borderRadius: BorderRadius.circular(3),
                       child: Container(
                         height: 6,
-                        color: T.borderStrong.withValues(alpha: 0.5),
+                        color: t.borderStrong.withValues(alpha: 0.5),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: progressFraction.clamp(0.0, 1.0),
@@ -138,10 +140,10 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                   const SizedBox(width: 12),
                   Text(
                     '${_currentQuestionIndex + 1} / ${widget.questions.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ],
@@ -161,21 +163,21 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                         horizontal: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: T.surfaceLow,
+                        color: t.surfaceLow,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: T.border, width: 0.8),
+                        border: Border.all(color: t.border, width: 0.8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.lock_rounded, size: 14, color: T.textSecondary),
+                        children: [
+                          Icon(Icons.lock_rounded, size: 14, color: t.textSecondary),
                           SizedBox(width: 6),
                           Text(
                             'Passage hidden during the quiz',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: T.textSecondary,
+                              color: t.textSecondary,
                             ),
                           ),
                         ],
@@ -184,7 +186,7 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                     const SizedBox(height: 20),
                     Text(
                       'QUESTION ${_currentQuestionIndex + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.6,
@@ -194,11 +196,11 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                     const SizedBox(height: 8),
                     Text(
                       question.prompt,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         height: 1.45,
-                        color: T.textPrimary,
+                        color: t.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -234,17 +236,17 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                                 onPressed: _goBack,
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 14),
-                                  side: const BorderSide(color: T.border),
+                                  side: BorderSide(color: t.border),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Back',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: T.textSecondary,
+                                    color: t.textSecondary,
                                   ),
                                 ),
                               ),
@@ -268,7 +270,7 @@ class _ComprehensionTestScreenState extends State<ComprehensionTestScreen> {
                                 children: [
                                   Text(
                                     isLastQuestion ? 'Submit Test' : 'Next Question',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
@@ -315,6 +317,7 @@ class _AnswerOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -322,10 +325,10 @@ class _AnswerOption extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
-          color: selected ? T.primaryBg : T.surfaceLowest,
+          color: selected ? t.primaryBg : t.surfaceLowest,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? T.primary : T.border,
+            color: selected ? T.primary : t.border,
             width: selected ? 1.4 : 0.8,
           ),
           boxShadow: selected
@@ -346,10 +349,10 @@ class _AnswerOption extends StatelessWidget {
               height: 28,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: selected ? T.primary : T.surfaceLow,
+                color: selected ? T.primary : t.surfaceLow,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? T.primary : T.border,
+                  color: selected ? T.primary : t.border,
                   width: 0.8,
                 ),
               ),
@@ -358,7 +361,7 @@ class _AnswerOption extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  color: selected ? Colors.white : T.textSecondary,
+                  color: selected ? Colors.white : t.textSecondary,
                 ),
               ),
             ),
@@ -369,7 +372,7 @@ class _AnswerOption extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ),

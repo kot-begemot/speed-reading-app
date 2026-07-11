@@ -50,6 +50,7 @@ class ChunkReadingRuntimeScreen extends ConsumerStatefulWidget {
 }
 
 class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeScreen> {
+  TTheme get t => T.of(context);
   static const List<_ChunkArticle> _articles = [
     _ChunkArticle(
       title: "The Art of Focus",
@@ -470,25 +471,25 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
 
   Widget _buildIntroScreen() {
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Exercise Intro',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -504,37 +505,37 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                   const SizedBox(height: 24),
                   _introGoalCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'SELECT TEXT ARTICLE',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _articleSelector(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _instructionsCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BENEFITS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -554,26 +555,26 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: T.surfaceLowest,
+        color: t.surfaceLowest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: T.border, width: 0.8),
+        border: Border.all(color: t.border, width: 0.8),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
           value: _selectedArticleIndex,
-          icon: const Icon(Icons.arrow_drop_down, color: T.textSecondary),
+          icon: Icon(Icons.arrow_drop_down, color: t.textSecondary),
           isExpanded: true,
-          dropdownColor: T.surfaceLowest,
+          dropdownColor: t.surfaceLowest,
           items: [
             ...List.generate(_articles.length, (index) {
               return DropdownMenuItem<int>(
                 value: index,
                 child: Text(
                   _articles[index].title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               );
@@ -585,7 +586,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 child: Text(
                   'Book: ${book.title}',
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: T.primary,
@@ -625,13 +626,13 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
           height: 56,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: T.textSecondary.withValues(alpha: 0.12),
+            color: t.textSecondary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(Icons.view_column, size: 30, color: T.textSecondary),
+          child: Icon(Icons.view_column, size: 30, color: t.textSecondary),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -640,7 +641,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -649,7 +650,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -663,10 +664,10 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: T.successBg,
+        color: t.successBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.center_focus_strong, size: 22, color: T.success),
@@ -690,7 +691,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],
@@ -704,8 +705,8 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
   Widget _instructionsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InstructionRow(
@@ -730,8 +731,8 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
   Widget _benefitsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -739,7 +740,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -748,7 +749,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -757,7 +758,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ],
@@ -767,9 +768,9 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
 
   Widget _introActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: T.surfaceLowest,
-        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      decoration: BoxDecoration(
+        color: t.surfaceLowest,
+        border: Border(top: BorderSide(color: t.border, width: 0.8)),
       ),
       child: SafeArea(
         top: false,
@@ -784,17 +785,17 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: T.border),
+                    side: BorderSide(color: t.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ),
@@ -813,7 +814,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 15,
@@ -831,11 +832,12 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (_showIntro) {
       return _buildIntroScreen();
     }
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -872,21 +874,21 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Chunk Reading',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _formatTime(_elapsedSeconds),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -910,11 +912,11 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
-        child: Icon(icon, size: 20, color: T.textSecondary),
+        child: Icon(icon, size: 20, color: t.textSecondary),
       ),
     );
   }
@@ -942,7 +944,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 fontSize: 17,
                 height: 1.55,
                 fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w500,
-                color: isCurrent ? T.primary : T.textPrimary.withValues(alpha: 0.8),
+                color: isCurrent ? T.primary : t.textPrimary.withValues(alpha: 0.8),
               ),
             ),
           );
@@ -963,20 +965,20 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
           const SizedBox(height: 16),
           Text(
             'Comprehension Check (${_currentQuestionIndex + 1}/${_questions.length})',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             question.question,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           const SizedBox(height: 32),
@@ -987,18 +989,18 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 child: ElevatedButton(
                   onPressed: () => _handleAnswerTap(word),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: T.surfaceLowest,
-                    foregroundColor: T.textPrimary,
+                    backgroundColor: t.surfaceLowest,
+                    foregroundColor: t.textPrimary,
                     elevation: 0,
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(color: T.border),
+                      side: BorderSide(color: t.border),
                     ),
                   ),
                   child: Text(
                     word,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                 ),
               );
@@ -1022,7 +1024,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
               // Chunk Size
               Row(
                 children: [
-                  const Text('Chunk Size: ', style: TextStyle(fontSize: 12, color: T.textSecondary)),
+                  Text('Chunk Size: ', style: TextStyle(fontSize: 12, color: t.textSecondary)),
                   const SizedBox(width: 4),
                   DropdownButton<int>(
                     value: _chunkSize,
@@ -1030,7 +1032,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                     items: [2, 3, 4].map((v) {
                       return DropdownMenuItem<int>(
                         value: v,
-                        child: Text('$v words', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                        child: Text('$v words', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -1050,7 +1052,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
               // WPM Speed
               Text(
                 '$_wpm WPM',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: T.primary,
@@ -1061,7 +1063,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: T.primary,
-              inactiveTrackColor: T.border,
+              inactiveTrackColor: t.border,
               thumbColor: T.primary,
               overlayColor: T.primary.withValues(alpha: 0.12),
               trackHeight: 4,
@@ -1088,13 +1090,13 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
             icon: Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 20),
             label: Text(_isPlaying ? 'Pause' : 'Play'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: T.surfaceLowest,
-              foregroundColor: T.textPrimary,
+              backgroundColor: t.surfaceLowest,
+              foregroundColor: t.textPrimary,
               elevation: 0,
               minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
-                side: const BorderSide(color: T.border),
+                side: BorderSide(color: t.border),
               ),
             ),
           ),
@@ -1108,7 +1110,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
 
     return Positioned.fill(
       child: Container(
-        color: T.surfaceLow.withValues(alpha: 0.98),
+        color: t.surfaceLow.withValues(alpha: 0.98),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -1118,8 +1120,8 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                 Container(
                   width: 68,
                   height: 68,
-                  decoration: const BoxDecoration(
-                    color: T.successBg,
+                  decoration: BoxDecoration(
+                    color: t.successBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -1129,30 +1131,30 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Exercise Complete!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'You successfully completed Chunk Reading.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: T.card(radius: 16),
+                  decoration: t.card(radius: 16),
                   child: Column(
                     children: [
                       _statRow('Speed (WPM)', '$_wpm WPM'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Comprehension', '$comprehensionAccuracy%'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
                     ],
                   ),
@@ -1166,17 +1168,17 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                           onPressed: _startNewGame,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: T.border),
+                            side: BorderSide(color: t.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Try Again',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: T.textPrimary,
+                              color: t.textPrimary,
                             ),
                           ),
                         ),
@@ -1203,7 +1205,7 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
                         ),
                         child: Text(
                           widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -1227,18 +1229,18 @@ class ChunkReadingRuntimeScreenState extends ConsumerState<ChunkReadingRuntimeSc
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ],
@@ -1254,6 +1256,7 @@ class _InstructionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1261,16 +1264,16 @@ class _InstructionRow extends StatelessWidget {
           width: 24,
           height: 24,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: T.surfaceLow,
+          decoration: BoxDecoration(
+            color: t.surfaceLow,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
         ),
@@ -1278,10 +1281,10 @@ class _InstructionRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ),

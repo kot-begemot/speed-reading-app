@@ -33,6 +33,7 @@ class FlashRecognitionRuntimeScreen extends StatefulWidget {
 }
 
 class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeScreen> {
+  TTheme get t => T.of(context);
   static const int _totalRounds = 10;
   static const int _exposureMs = 300;
 
@@ -232,25 +233,25 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
 
   Widget _buildIntroScreen() {
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Exercise Intro',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -266,25 +267,25 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                   const SizedBox(height: 24),
                   _introGoalCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _instructionsCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BENEFITS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -314,7 +315,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
           child: const Icon(Icons.bolt, size: 30, color: T.primary),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -323,7 +324,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -332,7 +333,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -346,10 +347,10 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: T.successBg,
+        color: t.successBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.center_focus_strong, size: 22, color: T.success),
@@ -373,7 +374,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],
@@ -387,8 +388,8 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
   Widget _instructionsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InstructionRow(
@@ -413,8 +414,8 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
   Widget _benefitsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -422,7 +423,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -431,7 +432,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -440,7 +441,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ],
@@ -450,9 +451,9 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
 
   Widget _introActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: T.surfaceLowest,
-        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      decoration: BoxDecoration(
+        color: t.surfaceLowest,
+        border: Border(top: BorderSide(color: t.border, width: 0.8)),
       ),
       child: SafeArea(
         top: false,
@@ -467,17 +468,17 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: T.border),
+                    side: BorderSide(color: t.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ),
@@ -496,7 +497,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 15,
@@ -514,11 +515,12 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (_showIntro) {
       return _buildIntroScreen();
     }
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -551,14 +553,14 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: T.surfaceLow,
+                color: t.surfaceLow,
                 shape: BoxShape.circle,
-                border: Border.all(color: T.border, width: 0.8),
+                border: Border.all(color: t.border, width: 0.8),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.close_rounded,
                 size: 20,
-                color: T.textSecondary,
+                color: t.textSecondary,
               ),
             ),
           ),
@@ -566,20 +568,20 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Flash Recognition · 300 ms',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _isFinished ? 'Complete' : 'Round ${_currentRoundIndex + 1} / $_totalRounds',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -603,11 +605,11 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
-        child: Icon(icon, size: 20, color: T.textSecondary),
+        child: Icon(icon, size: 20, color: t.textSecondary),
       ),
     );
   }
@@ -626,10 +628,10 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
             const SizedBox(height: 24),
             Text(
               showOptions ? 'What did you see?' : 'Prepare for flash...',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: T.textPrimary,
+                color: t.textPrimary,
               ),
             ),
             const SizedBox(height: 24),
@@ -644,25 +646,25 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                     final isCorrectOption = option == round.target;
                     final showFeedback = _flashPhase == 'feedback';
 
-                    Color cardBg = T.surfaceLowest;
-                    Color borderCol = T.border;
-                    Color textCol = T.textPrimary;
+                    Color cardBg = t.surfaceLowest;
+                    Color borderCol = t.border;
+                    Color textCol = t.textPrimary;
                     double borderWidth = 0.8;
 
                     if (showFeedback) {
                       if (isCorrectOption) {
-                        cardBg = T.successBg;
+                        cardBg = t.successBg;
                         borderCol = T.success;
                         textCol = T.success;
                         borderWidth = 1.4;
                       } else if (isSelected) {
-                        cardBg = T.dangerBg;
+                        cardBg = t.dangerBg;
                         borderCol = T.error;
                         textCol = T.error;
                         borderWidth = 1.4;
                       }
                     } else if (isSelected) {
-                      cardBg = T.primaryBg;
+                      cardBg = t.primaryBg;
                       borderCol = T.primary;
                       textCol = T.primary;
                       borderWidth = 1.4;
@@ -712,9 +714,9 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
       height: 120,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: T.surfaceLow,
+        color: t.surfaceLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: T.border),
+        border: Border.all(color: t.border),
       ),
       child: Center(
         child: AnimatedSwitcher(
@@ -723,7 +725,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
               ? Text(
                   round.target,
                   key: ValueKey(round.target),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: T.primary,
@@ -734,7 +736,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(
                     7,
-                    (_) => const Padding(
+                    (_) => Padding(
                       padding: EdgeInsets.symmetric(horizontal: 3),
                       child: Text(
                         '#',
@@ -760,11 +762,11 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _Metric(label: 'ACCURACY', value: '${_calculateAccuracy()}%', valueColor: T.success),
-          _Metric(label: 'STREAK', value: '$_streak', valueColor: T.textPrimary),
-          const _Metric(
+          _Metric(label: 'STREAK', value: '$_streak', valueColor: t.textPrimary),
+          _Metric(
             label: 'EXPOSURE',
             value: '300ms',
-            valueColor: T.textPrimary,
+            valueColor: t.textPrimary,
           ),
         ],
       ),
@@ -776,7 +778,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
 
     return Positioned.fill(
       child: Container(
-        color: T.surface.withValues(alpha: 0.98),
+        color: t.surface.withValues(alpha: 0.98),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -786,8 +788,8 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                 Container(
                   width: 68,
                   height: 68,
-                  decoration: const BoxDecoration(
-                    color: T.successBg,
+                  decoration: BoxDecoration(
+                    color: t.successBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -797,33 +799,33 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Exercise Complete!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'You finished Flash Recognition successfully.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 // Stats Card
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: T.card(radius: 16),
+                  decoration: t.card(radius: 16),
                   child: Column(
                     children: [
                       _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Accuracy achieved', '$acc%'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Max streak', '$_maxStreak'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Errors committed', '$_errorCount'),
                     ],
                   ),
@@ -837,17 +839,17 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                           onPressed: _startNewGame,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: T.border),
+                            side: BorderSide(color: t.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Try Again',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: T.textPrimary,
+                              color: t.textPrimary,
                             ),
                           ),
                         ),
@@ -874,7 +876,7 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
                         ),
                         child: Text(
                           widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -898,18 +900,18 @@ class FlashRecognitionRuntimeScreenState extends State<FlashRecognitionRuntimeSc
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ],
@@ -930,16 +932,17 @@ class _Metric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         const SizedBox(height: 2),
@@ -964,6 +967,7 @@ class _InstructionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -971,16 +975,16 @@ class _InstructionRow extends StatelessWidget {
           width: 24,
           height: 24,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: T.surfaceLow,
+          decoration: BoxDecoration(
+            color: t.surfaceLow,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
         ),
@@ -988,10 +992,10 @@ class _InstructionRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ),

@@ -13,22 +13,24 @@ class BaselineAssessmentScreen extends ConsumerStatefulWidget {
 }
 
 class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScreen> {
+  TTheme get t => T.of(context);
   String _selectedLangCode = 'en';
   int _currentQuestionIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     final state = ref.watch(baselineProvider(_selectedLangCode));
     final notifier = ref.read(baselineProvider(_selectedLangCode).notifier);
 
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
+        backgroundColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             if (state.step == BaselineStep.intro) {
               Navigator.pop(context);
@@ -46,10 +48,10 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                   : state.step == BaselineStep.quiz
                       ? 'Comprehension Check'
                       : 'Assessment Complete',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -106,18 +108,18 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     "Let's find your level",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'A quick diagnostic is required before training. '
                     "We'll measure your reading speed and comprehension "
                     'to pick a starting level for your language.',
@@ -125,7 +127,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.45,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -145,14 +147,14 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
 
   Widget _stepsCard() {
     return Container(
-      decoration: T.card(),
+      decoration: t.card(),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           _stepRow('1', 'Read a short text', '300–600 words at your own pace'),
-          const Divider(height: 1, thickness: 1, color: T.border),
+          Divider(height: 1, thickness: 1, color: t.border),
           _stepRow('2', 'Answer 5 questions', 'Multiple choice on what you read'),
-          const Divider(height: 1, thickness: 1, color: T.border),
+          Divider(height: 1, thickness: 1, color: t.border),
           _stepRow('3', 'Get your level', 'Start WPM, target & comprehension'),
         ],
       ),
@@ -168,13 +170,13 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: T.primaryBg,
+            decoration: BoxDecoration(
+              color: t.primaryBg,
               shape: BoxShape.circle,
             ),
             child: Text(
               number,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 color: T.primary,
@@ -188,18 +190,18 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   sub,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: T.textSecondary,
+                    color: t.textSecondary,
                   ),
                 ),
               ],
@@ -215,37 +217,37 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
       onTap: _showLanguagePicker,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        decoration: T.card(),
+        decoration: t.card(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(Icons.language, size: 22, color: T.textSecondary),
+            Icon(Icons.language, size: 22, color: t.textSecondary),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Diagnostic language',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _selectedLangCode == 'en' ? 'English' : 'Русский (Russian)',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down, color: T.textSecondary),
+            Icon(Icons.keyboard_arrow_down, color: t.textSecondary),
           ],
         ),
       ),
@@ -255,7 +257,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -265,18 +267,18 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Choose Language',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               ListTile(
                 leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
-                title: const Text('English', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text('English', style: TextStyle(fontWeight: FontWeight.w600)),
                 trailing: _selectedLangCode == 'en'
                     ? const Icon(Icons.check_circle_rounded, color: T.primary)
                     : null,
@@ -287,7 +289,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
               ),
               ListTile(
                 leading: const Text('🇷🇺', style: TextStyle(fontSize: 24)),
-                title: const Text('Русский (Russian)', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text('Русский (Russian)', style: TextStyle(fontWeight: FontWeight.w600)),
                 trailing: _selectedLangCode == 'ru'
                     ? const Icon(Icons.check_circle_rounded, color: T.primary)
                     : null,
@@ -314,7 +316,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
           color: T.primary,
           borderRadius: BorderRadius.circular(14),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -347,7 +349,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Elegant minimal top instruction (no warning/exclamation box)
-          const Text(
+          Text(
             'DIAGNOSTIC ASSESSMENT',
             style: TextStyle(
               fontSize: 10,
@@ -357,12 +359,12 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Read at your natural, comfortable pace.',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
           const SizedBox(height: 20),
@@ -375,31 +377,31 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                 children: [
                   Text(
                     text.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Topic: ${text.topic} · ${text.wordCount} words',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Divider(height: 1, thickness: 1, color: T.border),
+                  Divider(height: 1, thickness: 1, color: t.border),
                   const SizedBox(height: 18),
                   Text(
                     text.body,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       height: 1.65,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                       letterSpacing: 0.15,
                     ),
                   ),
@@ -419,7 +421,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
               ),
               elevation: 0,
             ),
-            child: const Text(
+            child: Text(
               "I'm finished reading",
               style: TextStyle(
                 fontSize: 16,
@@ -456,15 +458,15 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             children: [
               Text(
                 'Question ${_currentQuestionIndex + 1} of ${questions.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               Text(
                 '${((_currentQuestionIndex + 1) / questions.length * 100).round()}%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: T.primary,
@@ -478,7 +480,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             child: LinearProgressIndicator(
               value: (_currentQuestionIndex + 1) / questions.length,
               minHeight: 8,
-              backgroundColor: T.border,
+              backgroundColor: t.border,
               valueColor: const AlwaysStoppedAnimation<Color>(T.primary),
             ),
           ),
@@ -491,14 +493,14 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                 children: [
                   Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: T.card(),
+                    decoration: t.card(),
                     child: Text(
                       currentQuestion.prompt,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         height: 1.4,
-                        color: T.textPrimary,
+                        color: t.textPrimary,
                       ),
                     ),
                   ),
@@ -516,9 +518,9 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                           duration: const Duration(milliseconds: 150),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: isSelected ? T.primaryBg : Colors.white,
+                            color: isSelected ? t.primaryBg : Colors.white,
                             border: Border.all(
-                              color: isSelected ? T.primary : T.border,
+                              color: isSelected ? T.primary : t.border,
                               width: isSelected ? 2 : 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
@@ -540,7 +542,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isSelected ? T.primary : T.textSecondary,
+                                    color: isSelected ? T.primary : t.textSecondary,
                                     width: isSelected ? 6 : 2,
                                   ),
                                 ),
@@ -552,7 +554,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                    color: isSelected ? T.primary : T.textPrimary,
+                                    color: isSelected ? T.primary : t.textPrimary,
                                   ),
                                 ),
                               ),
@@ -580,17 +582,17 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: T.border),
+                      side: BorderSide(color: t.border),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Back',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: T.textPrimary,
+                        color: t.textPrimary,
                       ),
                     ),
                   ),
@@ -613,7 +615,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: T.primary,
-                    disabledBackgroundColor: T.border,
+                    disabledBackgroundColor: t.border,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -622,7 +624,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                   ),
                   child: Text(
                     _currentQuestionIndex < questions.length - 1 ? 'Next' : 'Submit Answers',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -659,8 +661,8 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     child: Container(
                       width: 80,
                       height: 80,
-                      decoration: const BoxDecoration(
-                        color: T.successBg,
+                      decoration: BoxDecoration(
+                        color: t.successBg,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -671,21 +673,21 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Diagnostic Complete!',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'We have calculated your metrics for ${_selectedLangCode == 'en' ? 'English' : 'Russian'}.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -709,7 +711,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                     ),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'YOUR ASSIGNED LEVEL',
                           style: TextStyle(
                             fontSize: 11,
@@ -721,7 +723,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                         const SizedBox(height: 6),
                         Text(
                           'Level $suggestedLevel',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
@@ -730,7 +732,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                         const SizedBox(height: 4),
                         Text(
                           _levelName(suggestedLevel),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -777,7 +779,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                   // Recommendation Card
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: T.card(),
+                    decoration: t.card(),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -787,21 +789,21 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Recommendation',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
-                                  color: T.textPrimary,
+                                  color: t.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 _levelRecommendation(suggestedLevel),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   height: 1.4,
-                                  color: T.textSecondary,
+                                  color: t.textSecondary,
                                 ),
                               ),
                             ],
@@ -826,7 +828,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
+            child: Text(
               'Continue to Trainer',
               style: TextStyle(
                 fontSize: 16,
@@ -861,10 +863,10 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               const SizedBox(height: 2),
@@ -874,18 +876,18 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
                 children: [
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: T.textPrimary,
+                      color: t.textPrimary,
                     ),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     unit,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ],
@@ -899,7 +901,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
     return Container(
       height: 72,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: T.card(),
+      decoration: t.card(),
       child: content,
     );
   }
@@ -942,12 +944,12 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
       builder: (context) {
         return AlertDialog(
           title: const Text('Exit Assessment?'),
-          content: const Text(
+          content: Text(
               'Your progress in this diagnostic will be lost. Are you sure you want to exit?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: T.textSecondary)),
+              child: Text('Cancel', style: TextStyle(color: t.textSecondary)),
             ),
             TextButton(
               onPressed: () {

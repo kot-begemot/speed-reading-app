@@ -80,48 +80,49 @@ class TrainerGalleryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: T.surface,
-      appBar: AppBar(
-        backgroundColor: T.surface,
-        title: const Text('Trainer mocks',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: T.textPrimary)),
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          children: [
-            for (final (section, items) in _sections) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
-                child: Text(section.toUpperCase(),
-                    style: const TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: T.textSecondary)),
-              ),
-              Container(
-                decoration: T.card(),
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  children: [
-                    for (var i = 0; i < items.length; i++) ...[
-                      if (i > 0) const Divider(height: 1, thickness: 0.8, color: T.border),
-                      ListTile(
-                        leading: Container(
-                          width: 38,
-                          height: 38,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: items[i].$3.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(items[i].$2, size: 20, color: items[i].$3),
-                        ),
-                        title: Text(items[i].$1,
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600, color: T.textPrimary)),
-                        trailing: const Icon(Icons.chevron_right_rounded, color: T.textSecondary),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => _screenFor(items[i].$1)),
+     final t = T.of(context);
+     return Scaffold(
+       backgroundColor: t.surface,
+       appBar: AppBar(
+         backgroundColor: t.surface,
+         title: Text('Trainer mocks',
+             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: t.textPrimary)),
+       ),
+       body: SafeArea(
+         child: ListView(
+           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+           children: [
+             for (final (section, items) in _sections) ...[
+               Padding(
+                 padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
+                 child: Text(section.toUpperCase(),
+                     style: TextStyle(
+                         fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.textSecondary)),
+               ),
+               Container(
+                 decoration: t.card(),
+                 clipBehavior: Clip.antiAlias,
+                 child: Column(
+                   children: [
+                     for (var i = 0; i < items.length; i++) ...[
+                       if (i > 0) Divider(height: 1, thickness: 0.8, color: t.border),
+                       ListTile(
+                         leading: Container(
+                           width: 38,
+                           height: 38,
+                           alignment: Alignment.center,
+                           decoration: BoxDecoration(
+                             color: items[i].$3.withValues(alpha: 0.12),
+                             borderRadius: BorderRadius.circular(10),
+                           ),
+                           child: Icon(items[i].$2, size: 20, color: items[i].$3),
+                         ),
+                         title: Text(items[i].$1,
+                             style: TextStyle(
+                                 fontSize: 15, fontWeight: FontWeight.w600, color: t.textPrimary)),
+                         trailing: Icon(Icons.chevron_right_rounded, color: t.textSecondary),
+                         onTap: () => Navigator.of(context).push(
+                           MaterialPageRoute(builder: (_) => _screenFor(items[i].$1)),
                         ),
                       ),
                     ],

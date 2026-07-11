@@ -26,6 +26,7 @@ class SchulteGorbovRuntimeScreen extends StatefulWidget {
 }
 
 class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> {
+  TTheme get t => T.of(context);
   static const int _gridSize = 7;
   static const int _totalCells = _gridSize * _gridSize;
 
@@ -189,25 +190,25 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
 
   Widget _buildIntroScreen() {
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Exercise Intro',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -223,25 +224,25 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                   const SizedBox(height: 24),
                   _introGoalCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _instructionsCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BENEFITS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -271,7 +272,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
           child: const Icon(Icons.grid_on, size: 30, color: T.accentViolet),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -280,7 +281,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -289,7 +290,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -303,10 +304,10 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: T.successBg,
+        color: t.successBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.center_focus_strong, size: 22, color: T.success),
@@ -330,7 +331,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],
@@ -344,8 +345,8 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
   Widget _instructionsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InstructionRow(
@@ -370,8 +371,8 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
   Widget _benefitsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -379,7 +380,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -388,7 +389,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -397,7 +398,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ],
@@ -407,9 +408,9 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
 
   Widget _introActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: T.surfaceLowest,
-        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      decoration: BoxDecoration(
+        color: t.surfaceLowest,
+        border: Border(top: BorderSide(color: t.border, width: 0.8)),
       ),
       child: SafeArea(
         top: false,
@@ -424,17 +425,17 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: T.border),
+                    side: BorderSide(color: t.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ),
@@ -453,7 +454,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 15,
@@ -471,11 +472,12 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (_showIntro) {
       return _buildIntroScreen();
     }
     return Scaffold(
-      backgroundColor: T.surfaceLow,
+      backgroundColor: t.surfaceLow,
       body: SafeArea(
         child: Stack(
           children: [
@@ -512,21 +514,21 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Schulte-Gorbov Table · 7×7',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _formatTime(_elapsedSeconds),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -550,11 +552,11 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
-        child: Icon(icon, size: 20, color: T.textSecondary),
+        child: Icon(icon, size: 20, color: t.textSecondary),
       ),
     );
   }
@@ -562,8 +564,8 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
   Widget _targetRow() {
     final nextColorName = _expectBlack ? 'BLACK' : 'RED';
     final nextValue = _expectBlack ? _nextBlack : _nextRed;
-    final themeColor = _expectBlack ? T.textPrimary : T.error;
-    final bgThemeColor = _expectBlack ? T.surfaceContainer : T.error.withValues(alpha: 0.12);
+    final themeColor = _expectBlack ? t.textPrimary : T.error;
+    final bgThemeColor = _expectBlack ? t.surfaceContainer : T.error.withValues(alpha: 0.12);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -571,9 +573,9 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Tap in order · Next',
-            style: TextStyle(fontSize: 13, color: T.textSecondary),
+            style: TextStyle(fontSize: 13, color: t.textSecondary),
           ),
           const SizedBox(width: 8),
           Container(
@@ -647,14 +649,14 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
       numberColor = T.error;
       border = Border.all(color: T.error, width: 1.6);
     } else if (isDone) {
-      fill = T.surfaceLow.withValues(alpha: 0.5);
+      fill = t.surfaceLow.withValues(alpha: 0.5);
       numberColor = cell.isBlack 
-          ? T.textSecondary.withValues(alpha: 0.2)
+          ? t.textSecondary.withValues(alpha: 0.2)
           : T.error.withValues(alpha: 0.2);
     } else {
-      fill = T.surfaceLowest;
-      numberColor = cell.isBlack ? T.textPrimary : T.error;
-      border = Border.all(color: T.border, width: 0.8);
+      fill = t.surfaceLowest;
+      numberColor = cell.isBlack ? t.textPrimary : T.error;
+      border = Border.all(color: t.border, width: 0.8);
     }
 
     return AnimatedContainer(
@@ -688,20 +690,20 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Progress',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 '$progress / $_totalCells',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -711,7 +713,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             borderRadius: BorderRadius.circular(3),
             child: Container(
               height: 6,
-              color: T.borderStrong.withValues(alpha: 0.5),
+              color: t.borderStrong.withValues(alpha: 0.5),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: fraction.clamp(0.0, 1.0),
@@ -725,13 +727,13 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
             icon: Icon(_isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded, size: 20),
             label: Text(_isPaused ? 'Resume' : 'Pause'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: T.surfaceLowest,
-              foregroundColor: T.textPrimary,
+              backgroundColor: t.surfaceLowest,
+              foregroundColor: t.textPrimary,
               elevation: 0,
               minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
-                side: const BorderSide(color: T.border),
+                side: BorderSide(color: t.border),
               ),
             ),
           ),
@@ -743,7 +745,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
   Widget _buildPausedOverlay() {
     return Positioned.fill(
       child: Container(
-        color: T.surfaceLow.withValues(alpha: 0.96),
+        color: t.surfaceLow.withValues(alpha: 0.96),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -751,8 +753,8 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
               Container(
                 width: 68,
                 height: 68,
-                decoration: const BoxDecoration(
-                  color: T.primaryBg,
+                decoration: BoxDecoration(
+                  color: t.primaryBg,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -762,18 +764,18 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Training Paused',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Grid is hidden to maintain focus.',
-                style: TextStyle(fontSize: 14, color: T.textSecondary),
+                style: TextStyle(fontSize: 14, color: t.textSecondary),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
@@ -786,7 +788,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'Resume Training',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                 ),
@@ -803,7 +805,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
 
     return Positioned.fill(
       child: Container(
-        color: T.surfaceLow.withValues(alpha: 0.98),
+        color: t.surfaceLow.withValues(alpha: 0.98),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -813,8 +815,8 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                 Container(
                   width: 68,
                   height: 68,
-                  decoration: const BoxDecoration(
-                    color: T.successBg,
+                  decoration: BoxDecoration(
+                    color: t.successBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -824,30 +826,30 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Exercise Complete!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'You successfully completed the Schulte-Gorbov Table.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: T.card(radius: 16),
+                  decoration: t.card(radius: 16),
                   child: Column(
                     children: [
                       _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Accuracy', '$accuracy%'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Errors committed', '$_errorCount'),
                     ],
                   ),
@@ -861,17 +863,17 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                           onPressed: _startNewGame,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: T.border),
+                            side: BorderSide(color: t.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Try Again',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: T.textPrimary,
+                              color: t.textPrimary,
                             ),
                           ),
                         ),
@@ -898,7 +900,7 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
                         ),
                         child: Text(
                           widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -922,18 +924,18 @@ class SchulteGorbovRuntimeScreenState extends State<SchulteGorbovRuntimeScreen> 
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ],
@@ -949,6 +951,7 @@ class _InstructionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -956,16 +959,16 @@ class _InstructionRow extends StatelessWidget {
           width: 24,
           height: 24,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: T.surfaceLow,
+          decoration: BoxDecoration(
+            color: t.surfaceLow,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
         ),
@@ -973,10 +976,10 @@ class _InstructionRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ),

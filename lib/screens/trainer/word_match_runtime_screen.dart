@@ -27,6 +27,7 @@ class WordMatchRuntimeScreen extends StatefulWidget {
 }
 
 class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
+  TTheme get t => T.of(context);
   static const int _totalRounds = 10;
 
   static final List<List<String>> _wordGroups = [
@@ -188,25 +189,25 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
 
   Widget _buildIntroScreen() {
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       appBar: AppBar(
-        backgroundColor: T.surface,
-        surfaceTintColor: T.surface,
+        backgroundColor: t.surface,
+        surfaceTintColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: T.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: t.textPrimary),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Exercise Intro',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ),
@@ -222,25 +223,25 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                   const SizedBox(height: 24),
                   _introGoalCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'HOW TO PLAY',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _instructionsCard(),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BENEFITS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -270,7 +271,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
           child: const Icon(Icons.find_in_page_rounded, size: 30, color: T.warning),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -279,7 +280,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -288,7 +289,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -302,10 +303,10 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: T.successBg,
+        color: t.successBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.center_focus_strong, size: 22, color: T.success),
@@ -329,7 +330,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
               ],
@@ -343,8 +344,8 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
   Widget _instructionsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InstructionRow(
@@ -369,8 +370,8 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
   Widget _benefitsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: T.card(radius: 16),
-      child: const Column(
+      decoration: t.card(radius: 16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -378,7 +379,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -387,7 +388,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
           SizedBox(height: 12),
@@ -396,7 +397,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             style: TextStyle(
               fontSize: 14,
               height: 1.45,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ],
@@ -406,9 +407,9 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
 
   Widget _introActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: T.surfaceLowest,
-        border: Border(top: BorderSide(color: T.border, width: 0.8)),
+      decoration: BoxDecoration(
+        color: t.surfaceLowest,
+        border: Border(top: BorderSide(color: t.border, width: 0.8)),
       ),
       child: SafeArea(
         top: false,
@@ -423,17 +424,17 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: T.border),
+                    side: BorderSide(color: t.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: T.textSecondary,
+                      color: t.textSecondary,
                     ),
                   ),
                 ),
@@ -452,7 +453,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 15,
@@ -470,11 +471,12 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     if (_showIntro) {
       return _buildIntroScreen();
     }
     return Scaffold(
-      backgroundColor: T.surface,
+      backgroundColor: t.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -509,21 +511,21 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Visual Word Match',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 _formatTime(_elapsedSeconds),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: T.textPrimary,
+                  color: t.textPrimary,
                 ),
               ),
             ],
@@ -547,11 +549,11 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: T.surfaceLowest,
+          color: t.surfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: T.border, width: 0.8),
+          border: Border.all(color: t.border, width: 0.8),
         ),
-        child: Icon(icon, size: 20, color: T.textSecondary),
+        child: Icon(icon, size: 20, color: t.textSecondary),
       ),
     );
   }
@@ -567,18 +569,18 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             children: [
               Text(
                 'Round ${_currentRoundIndex + 1} / $_totalRounds',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
               Text(
                 'Errors: $_errorCount',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: T.textSecondary,
+                  color: t.textSecondary,
                 ),
               ),
             ],
@@ -591,7 +593,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             borderRadius: BorderRadius.circular(3),
             child: Container(
               height: 4,
-              color: T.border.withValues(alpha: 0.5),
+              color: t.border.withValues(alpha: 0.5),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: fraction.clamp(0.0, 1.0),
@@ -629,7 +631,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
             alignment: Alignment.center,
             child: Column(
               children: [
-                const Text(
+                Text(
                   'FIND THIS WORD',
                   style: TextStyle(
                     fontSize: 11,
@@ -641,7 +643,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                 const SizedBox(height: 6),
                 Text(
                   round.target,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
@@ -667,9 +669,9 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                         final optionWord = round.options[index];
                         final isFlashingError = _flashingIncorrectWord == optionWord;
 
-                        Color cardBg = T.surfaceLowest;
-                        Color textCol = T.textPrimary;
-                        Border? border = Border.all(color: T.border, width: 0.8);
+                        Color cardBg = t.surfaceLowest;
+                        Color textCol = t.textPrimary;
+                        Border? border = Border.all(color: t.border, width: 0.8);
 
                         if (isFlashingError) {
                           cardBg = T.error.withValues(alpha: 0.15);
@@ -719,7 +721,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
 
     return Positioned.fill(
       child: Container(
-        color: T.surfaceLow.withValues(alpha: 0.98),
+        color: t.surfaceLow.withValues(alpha: 0.98),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -729,8 +731,8 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                 Container(
                   width: 68,
                   height: 68,
-                  decoration: const BoxDecoration(
-                    color: T.successBg,
+                  decoration: BoxDecoration(
+                    color: t.successBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -740,30 +742,30 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Exercise Complete!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: T.textPrimary,
+                    color: t.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'You successfully completed Visual Word Match.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: T.textSecondary),
+                  style: TextStyle(fontSize: 13, color: t.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: T.card(radius: 16),
+                  decoration: t.card(radius: 16),
                   child: Column(
                     children: [
                       _statRow('Time elapsed', _formatTime(_elapsedSeconds)),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Accuracy', '$accuracy%'),
-                      const Divider(height: 20, thickness: 0.8, color: T.border),
+                      Divider(height: 20, thickness: 0.8, color: t.border),
                       _statRow('Errors committed', '$_errorCount'),
                     ],
                   ),
@@ -777,17 +779,17 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                           onPressed: _startNewGame,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: T.border),
+                            side: BorderSide(color: t.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Try Again',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: T.textPrimary,
+                              color: t.textPrimary,
                             ),
                           ),
                         ),
@@ -814,7 +816,7 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
                         ),
                         child: Text(
                           widget.onComplete != null ? 'Continue' : 'Exit to Trainer',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -838,18 +840,18 @@ class WordMatchRuntimeScreenState extends State<WordMatchRuntimeScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: T.textSecondary,
+            color: t.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: T.textPrimary,
+            color: t.textPrimary,
           ),
         ),
       ],
@@ -865,6 +867,7 @@ class _InstructionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = T.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -872,16 +875,16 @@ class _InstructionRow extends StatelessWidget {
           width: 24,
           height: 24,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: T.surfaceLow,
+          decoration: BoxDecoration(
+            color: t.surfaceLow,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: T.textSecondary,
+              color: t.textSecondary,
             ),
           ),
         ),
@@ -889,10 +892,10 @@ class _InstructionRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: T.textPrimary,
+              color: t.textPrimary,
             ),
           ),
         ),
